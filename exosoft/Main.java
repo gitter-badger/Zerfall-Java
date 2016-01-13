@@ -84,17 +84,23 @@ class Main extends JFrame implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		keys[e.getKeyCode()] = true;
+		if (e.getKeyCode() < 256) {
+			keys[e.getKeyCode()] = true;
+		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		keys[e.getKeyCode()] = true;
+		if (e.getKeyCode() < 256) {
+			keys[e.getKeyCode()] = true;
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		keys[e.getKeyCode()] = false;
+		if (e.getKeyCode() < 256) {
+			keys[e.getKeyCode()] = false;
+		}
 	}
 
 	public static class Player {
