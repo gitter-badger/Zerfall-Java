@@ -99,6 +99,7 @@ class Main extends JFrame implements KeyListener {
 
 	public static class Player {
 		BufferedImage sprites[] = new BufferedImage[8];
+		Rectangle bounds = new 
 		double xPos = 2270;
 		double yPos = 1240;
 		double yVel = 0;
@@ -110,6 +111,7 @@ class Main extends JFrame implements KeyListener {
 			try {
 				temp = ImageIO.read(new File("resources/sprites/player.png"));
 			} catch (IOException e) {
+			    e.printStackTrace();
 			}
 			for (int i = 0; i < 8; i++) {
 				sprites[i] = temp.getSubimage(i * 175, 0, 175, 161);
@@ -120,9 +122,9 @@ class Main extends JFrame implements KeyListener {
 			int c;
 			for (int i = 0; i < 5; i++)
 				collision[i] = false;
-			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x++) {
-				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y++) {
-					c = bitmap.getRGB(x, y);
+			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 5) {
+				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 5) {
+					c = bitmap.getRGB((int) x / 5, (int) y / 5);
 					switch (c) {
 					case 0xFF000000:
 						collision[1] = true;
@@ -133,9 +135,9 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x++) {
-				for (int y = (int) yPos; y <= yPos - 1 - Math.abs(yVel); y--) {
-					c = bitmap.getRGB(x, y);
+			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 5) {
+				for (int y = (int) yPos; y <= yPos - 1 - Math.abs(yVel); y -= 5) {
+					c = bitmap.getRGB((int) x / 5, (int) y / 5);
 					switch (c) {
 					case 0xFF000000:
 						collision[2] = true;
@@ -143,9 +145,9 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			leftLoop: for (int x = (int) (xPos + 20); x <= xPos + 25; x++) {
-				for (int y = (int) yPos; y <= yPos + 161; y++) {
-					c = bitmap.getRGB(x, y);
+			leftLoop: for (int x = (int) (xPos + 20); x <= xPos + 25; x += 5) {
+				for (int y = (int) yPos; y <= yPos + 161; y += 5) {
+					c = bitmap.getRGB((int) x / 5, (int) y / 5);
 					switch (c) {
 					case 0xFFFF0000:
 						if (keys[KeyEvent.VK_E]) {
@@ -159,7 +161,7 @@ class Main extends JFrame implements KeyListener {
 			}
 			rightLoop: for (int x = (int) (xPos + 150); x <= xPos + 155; x++) {
 				for (int y = (int) yPos; y <= yPos + 161; y++) {
-					c = bitmap.getRGB(x, y);
+					c = bitmap.getRGB((int) x / 5, (int) y / 5);
 					switch (c) {
 					case 0xFFFF0000:
 						if (keys[KeyEvent.VK_E]) {
@@ -179,19 +181,19 @@ class Main extends JFrame implements KeyListener {
 			}
 			if (keys[KeyEvent.VK_A] && collision[3] == false) {
 				xPos -= 4;
-				if (collision[1] == true && spriteNum != 0) {
+				if (collision[1] && spriteNum != 0) {
 					spriteNum = 0;
 				}
 			}
 			if (keys[KeyEvent.VK_D] && collision[4] == false) {
 				xPos += 4;
-				if (collision[1] == true && spriteNum != 2)
+				if (collision[1] && spriteNum != 2)
 					spriteNum = 2;
 			}
 			if (keys[KeyEvent.VK_W]) {
-				if (collision[0] == true) {
+				if (collision[0]) {
 					yVel = -4;
-				} else if (collision[1] == true) {
+				} else if (collision[1]) {
 					yVel -= 12;
 					if (spriteNum % 2 == 0) {
 						spriteNum++;
@@ -203,32 +205,26 @@ class Main extends JFrame implements KeyListener {
 		}
 
 		public void openDoor(int givenX, int givenY) {
-			int x = givenX;
-			int y = givenY;
-			int w = 0;
+			int x = givenX / 10;
+			int y = givenY / 10;
 			int h = 0;
 			boolean bool[] = new boolean[4];
-			System.out.println(x);
-			System.out.println(y);
 			int doorColor = 0xFFFF0000;
 			while ((bool[0] && bool[1] && bool[2] && bool[3]) == false) {
-				if ((bool[0] = !(bitmap.getRGB(x - 1, y) == doorColor)) == false) {
-					x--;
-				} else if ((bool[1] = !(bitmap.getRGB(x, y - 1) == doorColor)) == false) {
+				if ((bool[1] = (bitmap.getRGB(x, y - 1) != doorColor))) {
 					y--;
-				} else if ((bool[2] = !(bitmap.getRGB(x + w + 1, y) == doorColor)) == false) {
-					w++;
-				} else if ((bool[3] = !(bitmap.getRGB(x, y + h + 1) == doorColor)) == false) {
+				}
+				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor))) {
 					h++;
 				}
 			}
 			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
 			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
-			bitmapGraphics.setColor(new Color(0xFFFFFFFF));
-			bitmapGraphics.fillRect(x, y, w + 1, h + 1);
+			bitmapGraphics.setColor(Color.white);
+			bitmapGraphics.fillRect(x, y, 1, h);
 			bitmapGraphics.dispose();
 			foregroundGraphics.setComposite(AlphaComposite.Clear);
-			foregroundGraphics.fillRect(x, y, w + 1, h + 1);
+			foregroundGraphics.fillRect(x * 10, y * 10, 11, h * 10 + 1);
 			foregroundGraphics.dispose();
 		}
 	}
