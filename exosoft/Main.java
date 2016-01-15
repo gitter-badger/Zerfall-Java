@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,9 +57,10 @@ class Main extends JFrame implements KeyListener {
 		});
 
 		try {
-			map = ImageIO.read(new File("resources/Maps/map.png"));
+			map = ImageIO.read(new File("resources/Maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/Maps/bitmap.png"));
-			foreground = ImageIO.read(new File("resources/Maps/foreground.png"));
+			foreground = ImageIO
+					.read(new File("resources/Maps/foreground.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -73,10 +75,12 @@ class Main extends JFrame implements KeyListener {
 			Graphics2D g = (Graphics2D) g1;
 			g.setColor(Color.black);
 			g.fillRect(0, 0, getWidth(), getHeight());
-			g.translate((int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+			g.translate(
+					(int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
 					(int) -(player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
-			g.drawImage(map, 0, 0, null);
-			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos, (int) player.yPos, null);
+			g.drawImage(bitmap, 0, 0, map.getWidth(), map.getHeight(), null);
+			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos,
+					(int) player.yPos, null);
 			g.drawImage(foreground, 0, 0, null);
 			g.dispose();
 		}
@@ -105,7 +109,7 @@ class Main extends JFrame implements KeyListener {
 
 	public static class Player {
 		BufferedImage sprites[] = new BufferedImage[8];
-		Rectangle bounds = new 
+		Rectangle bounds = new Rectangle();
 		double xPos = 2270;
 		double yPos = 1240;
 		double yVel = 0;
@@ -117,7 +121,7 @@ class Main extends JFrame implements KeyListener {
 			try {
 				temp = ImageIO.read(new File("resources/sprites/player.png"));
 			} catch (IOException e) {
-			    e.printStackTrace();
+				e.printStackTrace();
 			}
 			for (int i = 0; i < 8; i++) {
 				sprites[i] = temp.getSubimage(i * 175, 0, 175, 161);
@@ -128,9 +132,10 @@ class Main extends JFrame implements KeyListener {
 			int c;
 			for (int i = 0; i < 5; i++)
 				collision[i] = false;
-			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 5) {
-				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 5) {
-					c = bitmap.getRGB((int) x / 5, (int) y / 5);
+			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
+				for (int y = (int) (yPos + 161); y <= yPos + 162
+						+ Math.abs(yVel); y += 10) {
+					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFF000000:
 						collision[1] = true;
@@ -141,9 +146,9 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 5) {
-				for (int y = (int) yPos; y <= yPos - 1 - Math.abs(yVel); y -= 5) {
-					c = bitmap.getRGB((int) x / 5, (int) y / 5);
+			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
+				for (int y = (int) yPos; y <= yPos - 1 - Math.abs(yVel); y -= 10) {
+					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFF000000:
 						collision[2] = true;
@@ -151,9 +156,9 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			leftLoop: for (int x = (int) (xPos + 20); x <= xPos + 25; x += 5) {
-				for (int y = (int) yPos; y <= yPos + 161; y += 5) {
-					c = bitmap.getRGB((int) x / 5, (int) y / 5);
+			leftLoop: for (int x = (int) (xPos + 20); x <= xPos + 25; x += 10) {
+				for (int y = (int) yPos; y <= yPos + 150; y += 10) {
+					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFFFF0000:
 						if (keys[KeyEvent.VK_E]) {
@@ -165,9 +170,9 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			rightLoop: for (int x = (int) (xPos + 150); x <= xPos + 155; x++) {
-				for (int y = (int) yPos; y <= yPos + 161; y++) {
-					c = bitmap.getRGB((int) x / 5, (int) y / 5);
+			rightLoop: for (int x = (int) (xPos + 150); x <= xPos + 155; x += 10) {
+				for (int y = (int) yPos; y <= yPos + 150; y += 10) {
+					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFFFF0000:
 						if (keys[KeyEvent.VK_E]) {
@@ -216,14 +221,17 @@ class Main extends JFrame implements KeyListener {
 			int h = 0;
 			boolean bool[] = new boolean[4];
 			int doorColor = 0xFFFF0000;
-			while ((bool[0] && bool[1] && bool[2] && bool[3]) == false) {
-				if ((bool[1] = (bitmap.getRGB(x, y - 1) != doorColor))) {
+			while (!(bool[1] && bool[3])) {
+				if ((bool[1] = (bitmap.getRGB(x, y - 1) != doorColor)) == false) {
 					y--;
 				}
-				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor))) {
+				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor)) == false) {
 					h++;
 				}
+				System.out.println(bool[1] + ", " + bool[3]);
 			}
+			h++;
+			System.out.println(y + ", " + h);
 			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
 			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
 			bitmapGraphics.setColor(Color.white);
