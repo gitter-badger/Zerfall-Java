@@ -184,19 +184,19 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			if (collision[1] == false) {
+			if (!collision[1]) {
 				yVel += .4;
 			} else {
 				yVel = 0;
 				spriteNum -= spriteNum % 2;
 			}
-			if (keys[KeyEvent.VK_A] && collision[3] == false) {
+			if (keys[KeyEvent.VK_A] && !collision[3]) {
 				xPos -= 4;
 				if (collision[1] && spriteNum != 0) {
 					spriteNum = 0;
 				}
 			}
-			if (keys[KeyEvent.VK_D] && collision[4] == false) {
+			if (keys[KeyEvent.VK_D] && !collision[4]) {
 				xPos += 4;
 				if (collision[1] && spriteNum != 2)
 					spriteNum = 2;
@@ -206,9 +206,7 @@ class Main extends JFrame implements KeyListener {
 					yVel = -4;
 				} else if (collision[1]) {
 					yVel -= 12;
-					if (spriteNum % 2 == 0) {
-						spriteNum++;
-					}
+					spriteNum += spriteNum % 2 - 1;
 				}
 			}
 			if (collision[2]) {
@@ -227,11 +225,10 @@ class Main extends JFrame implements KeyListener {
 				if ((bool[1] = (bitmap.getRGB(x, y - 1) != doorColor)) == false) {
 					y--;
 				}
-				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor)) == false) {
+				if ((bool[3] = (bitmap.getRGB(x, y + h) != doorColor)) == false) {
 					h++;
 				}
 			}
-			h++;
 			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
 			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
 			bitmapGraphics.setColor(Color.white);
