@@ -1,4 +1,9 @@
 ### What is this pile of spaghetti code?
-A Java 8 version of the Processing game Zerfall, built in Eclipse Neon. I really need to stop changing programming languages.
-### What's Zerfall? What does that word even mean?
-Zerfall is German for the word "decay", which makes sense, because Zerfall is a zombie survival platformer.
+
+A Java 8 version of the Processing game Zerfall, built in Eclipse. Zerfall is Exoplanet Software's first *legitimate* game, so we're trying quite hard to make it the best it can be.
+
+Zerfall is German for decay, which makes sense, because this game is a 2D wave-based zombie survival platformer similar to Treyarch Studios' Call of Duty Zombies. 
+
+``` java
+package com.exosoft;
+```
