@@ -57,10 +57,10 @@ class Main extends JFrame implements KeyListener {
 		});
 
 		try {
-			map = ImageIO.read(new File("resources/Maps/background.png"));
-			bitmap = ImageIO.read(new File("resources/Maps/bitmap.png"));
+			map = ImageIO.read(new File("resources/maps/background.png"));
+			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
 			foreground = ImageIO
-					.read(new File("resources/Maps/foreground.png"));
+					.read(new File("resources/maps/foreground.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -78,7 +78,7 @@ class Main extends JFrame implements KeyListener {
 			g.translate(
 					(int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
 					(int) -(player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
-			g.drawImage(bitmap, 0, 0, map.getWidth(), map.getHeight(), null);
+			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
 			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos,
 					(int) player.yPos, null);
 			g.drawImage(foreground, 0, 0, null);
@@ -147,7 +147,7 @@ class Main extends JFrame implements KeyListener {
 				}
 			}
 			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
-				for (int y = (int) yPos; y <= yPos - 1 - Math.abs(yVel); y -= 10) {
+				for (int y = (int) yPos; y >= yPos - 1 - Math.abs(yVel); y -= 10) {
 					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFF000000:
@@ -210,7 +210,9 @@ class Main extends JFrame implements KeyListener {
 						spriteNum++;
 					}
 				}
-
+			}
+			if (collision[2]) {
+				yVel = Math.abs(yVel);
 			}
 			yPos += yVel;
 		}
@@ -228,10 +230,8 @@ class Main extends JFrame implements KeyListener {
 				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor)) == false) {
 					h++;
 				}
-				System.out.println(bool[1] + ", " + bool[3]);
 			}
 			h++;
-			System.out.println(y + ", " + h);
 			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
 			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
 			bitmapGraphics.setColor(Color.white);
