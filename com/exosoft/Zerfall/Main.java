@@ -1,4 +1,4 @@
-package exosoft;
+package com.exosoft.Zerfall;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -9,42 +9,37 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 @SuppressWarnings("serial")
-class Main extends JFrame implements KeyListener {
+class Main {
 	static boolean keys[] = new boolean[256];
 	static BufferedImage map = null;
 	static BufferedImage bitmap = null;
+	static BufferedImage foreground = null;
 	static Sheet sheet = new Sheet();
 	static Player player = new Player();
 	static Timer drawTimer, logicTimer;
-	static BufferedImage foreground = null;
-
-	Main() {
-		super("Zerfall");
-		setSize(1280, 720);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		add(sheet);
-		setVisible(true);
-		setResizable(false);
-		addKeyListener(this);
-	}
+	static Sound dryFire = null;
+	static Runnable sound;
+	static Thread processSound;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+		processSound = new Thread(new Runnable() {
+			@Override
 			public void run() {
-				new Main();
+				if (keys[KeyEvent.VK_SPACE]) {
+					dryFire.play();
+				}
 			}
 		});
+		
 		drawTimer = new Timer(1000 / 60, new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				sheet.repaint();
@@ -55,17 +50,22 @@ class Main extends JFrame implements KeyListener {
 				player.logic();
 			}
 		});
-
 		try {
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
-			foreground = ImageIO
-					.read(new File("resources/maps/foreground.png"));
-		} catch (IOException e) {
+			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
+			dryFire = new Sound("resources/sounds/Guns/dry-fire.au");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		drawTimer.start();
+		System.out.println(dryFire);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				new Window();
+			}
+		});
 		logicTimer.start();
+		drawTimer.start();
 	}
 
 	static class Sheet extends JPanel {
@@ -75,42 +75,19 @@ class Main extends JFrame implements KeyListener {
 			Graphics2D g = (Graphics2D) g1;
 			g.setColor(Color.black);
 			g.fillRect(0, 0, getWidth(), getHeight());
-			g.translate(
-					(int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+			g.translate((int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
 					(int) -(player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
 			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
-			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos,
-					(int) player.yPos, null);
+			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos, (int) player.yPos, null);
 			g.drawImage(foreground, 0, 0, null);
 			g.dispose();
-		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		if (e.getKeyCode() < 256) {
-			keys[e.getKeyCode()] = true;
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() < 256) {
-			keys[e.getKeyCode()] = true;
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() < 256) {
-			keys[e.getKeyCode()] = false;
 		}
 	}
 
 	public static class Player {
 		BufferedImage sprites[] = new BufferedImage[8];
 		Rectangle bounds = new Rectangle();
-		double xPos = 2270;
+		double xPos = 4500;
 		double yPos = 1240;
 		double yVel = 0;
 		int spriteNum = 0;
@@ -133,12 +110,12 @@ class Main extends JFrame implements KeyListener {
 			for (int i = 0; i < 5; i++)
 				collision[i] = false;
 			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
-				for (int y = (int) (yPos + 161); y <= yPos + 162
-						+ Math.abs(yVel); y += 10) {
+				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 10) {
 					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
 					case 0xFF000000:
 						collision[1] = true;
+						yPos = Math.round((y - 161) / 10) * 10;
 						break lowerLoop;
 					case 0xFF0000FF:
 						collision[0] = true;
@@ -184,30 +161,53 @@ class Main extends JFrame implements KeyListener {
 					}
 				}
 			}
-			if (!collision[1]) {
-				yVel += .4;
-			} else {
+			if (collision[1]) {
 				yVel = 0;
 				spriteNum -= spriteNum % 2;
+			} else {
+				yVel += .4;
 			}
-			if (keys[KeyEvent.VK_A] && !collision[3]) {
-				xPos -= 4;
-				if (collision[1] && spriteNum != 0) {
-					spriteNum = 0;
+			if (keys[KeyEvent.VK_A]) {
+				if (!collision[3]) {
+					xPos -= 4;
+				}
+				switch (spriteNum) {
+				case 2:
+				case 3:
+				case 6:
+				case 7:
+					spriteNum -= 2;
+					break;
 				}
 			}
-			if (keys[KeyEvent.VK_D] && !collision[4]) {
-				xPos += 4;
-				if (collision[1] && spriteNum != 2)
-					spriteNum = 2;
+			if (keys[KeyEvent.VK_D]) {
+				if (collision[4] == false) {
+					xPos += 4;
+				}
+				switch (spriteNum) {
+				case 0:
+				case 1:
+				case 4:
+				case 5:
+					spriteNum += 2;
+					break;
+				}
 			}
 			if (keys[KeyEvent.VK_W]) {
 				if (collision[0]) {
 					yVel = -4;
 				} else if (collision[1]) {
 					yVel -= 12;
-					spriteNum += spriteNum % 2 - 1;
+					spriteNum += (spriteNum + 1) % 2;
 				}
+			}
+			if (keys[KeyEvent.VK_SPACE] && spriteNum < 4) {
+				spriteNum += 4;
+				if (!dryFire.isPlaying()) {
+					dryFire.play();
+				}
+			} else if (spriteNum > 3) {
+				spriteNum -= 4;
 			}
 			if (collision[2]) {
 				yVel = Math.abs(yVel);
@@ -225,10 +225,11 @@ class Main extends JFrame implements KeyListener {
 				if ((bool[1] = (bitmap.getRGB(x, y - 1) != doorColor)) == false) {
 					y--;
 				}
-				if ((bool[3] = (bitmap.getRGB(x, y + h) != doorColor)) == false) {
+				if ((bool[3] = (bitmap.getRGB(x, y + h + 1) != doorColor)) == false) {
 					h++;
 				}
 			}
+			h++;
 			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
 			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
 			bitmapGraphics.setColor(Color.white);
