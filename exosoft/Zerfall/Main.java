@@ -42,7 +42,7 @@ class Main {
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new Window();
+				new Window("Zerfall", 1920, 1080, false);
 			}
 		});
 		logicTimer.start();

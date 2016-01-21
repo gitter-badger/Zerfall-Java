@@ -15,7 +15,7 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(Main.sheet);
 		setVisible(true);
-		if (!resizable) { setResizable(false); }
+		setResizable(resizable);
 		addKeyListener(this);
 		addMouseListener(this);
 	}
