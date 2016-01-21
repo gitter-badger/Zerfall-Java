@@ -9,20 +9,40 @@ import java.awt.event.MouseListener;
 import javax.swing.JFrame;
 
 public class Window extends JFrame implements KeyListener, MouseListener {
-	public Window() throws HeadlessException {
-		super("Zerfall");
-		setSize(1920, 1080);
+	public Window(String title, int width, int height, boolean resizable) throws HeadlessException {
+		super(title);
+		setSize(width, height);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(Main.sheet);
 		setVisible(true);
-		setResizable(false);
+		if (!resizable) { setResizable(false); }
 		addKeyListener(this);
 		addMouseListener(this);
 	}
 
+     public Window(String title, int width, int height) throws HeadlessException {
+           super(title);
+           setSize(width, height);
+           setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+           add(Main.sheet);
+           setVisible(true);
+           setResizable(false);
+           addKeyListener(this);
+           addMouseListener(this);
+      }
+      public Window(int width, int height) {
+          super();
+          setSize(width, height);
+          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          add(Main.sheet);
+          setVisible(true);
+          setResizable(false);
+          addKeyListener(this);
+          addMouseListener(this);
+      }
+      
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -33,7 +53,6 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
