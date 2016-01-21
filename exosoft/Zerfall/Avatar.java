@@ -1,18 +1,12 @@
-package com.exosoft.Zerfall;
+package exosoft.Zerfall;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 public class Avatar extends Sprite {
-	BufferedImage sprites[] = new BufferedImage[8];
 	Rectangle bounds = new Rectangle();
 	double xPos = 4500;
 	double yPos = 1240;

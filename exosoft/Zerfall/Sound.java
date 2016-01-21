@@ -1,4 +1,4 @@
-package com.exosoft.Zerfall;
+package exosoft.Zerfall;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +17,10 @@ public class Sound {
 		try {
 			File soundFile = new File(path);
 		    AudioInputStream sound = AudioSystem.getAudioInputStream(soundFile);
-
-		    // load the sound into memory (a Clip)
 		    DataLine.Info info = new DataLine.Info(Clip.class, sound.getFormat());
 		    clip = (Clip) AudioSystem.getLine(info);
 		    clip.open(sound);
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -37,7 +34,20 @@ public class Sound {
 		return clip.isRunning();
 	}
 	
+	void pause() {
+		clip.stop();
+	}
+	
 	void stop() {
 		clip.stop();
+		clip.setMicrosecondPosition(0);
+	}
+	
+	long msPosition() {
+		return clip.getMicrosecondPosition();
+	}
+	
+	double positionRatio() {
+		return (clip.getMicrosecondPosition() / clip.getMicrosecondLength());
 	}
 }

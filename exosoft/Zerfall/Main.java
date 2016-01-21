@@ -1,4 +1,4 @@
-package com.exosoft.Zerfall;
+package exosoft.Zerfall;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -61,6 +61,10 @@ class Main {
 			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
 			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos, (int) player.yPos, null);
 			g.drawImage(foreground, 0, 0, null);
+			g.setColor(Color.blue);
+			g.translate((int) (player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+					(int) (player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
+			g.drawString("Zerfall", 25, 25);
 			g.dispose();
 		}
 	}

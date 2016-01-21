@@ -1,4 +1,4 @@
-package com.exosoft.Zerfall;
+package exosoft.Zerfall;
 
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 public class Window extends JFrame implements KeyListener, MouseListener {
 	public Window() throws HeadlessException {
 		super("Zerfall");
-		setSize(1280, 720);
+		setSize(1920, 1080);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(Main.sheet);
 		setVisible(true);
