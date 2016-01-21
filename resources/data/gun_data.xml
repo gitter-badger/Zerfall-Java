@@ -24,7 +24,7 @@
 		<eti> 169 </eti>
 		<clip> 30 </clip>
 	</gun>
-	<gun name = "FAMAS" id = "famas">
+	<gun name = "FAMAS" id = "fms">
 		<mode> full </mode>
 		<rpm> 950 </rpm>
 		<eti> 47 </eti>
