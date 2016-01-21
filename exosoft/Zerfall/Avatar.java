@@ -94,7 +94,7 @@ public class Avatar extends Sprite {
 			}
 		}
 		if (keys[KeyEvent.VK_D]) {
-			if (collision[4] == false) {
+			if (!collision[4]) {
 				xPos += 4;
 			}
 			switch (spriteNum) {
