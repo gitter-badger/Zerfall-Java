@@ -8,10 +8,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @SuppressWarnings("serial")
 class Main {
@@ -47,6 +54,7 @@ class Main {
 		});
 		logicTimer.start();
 		drawTimer.start();
+		new Weapon("ak");
 	}
 
 	static class Sheet extends JPanel {
@@ -67,5 +75,22 @@ class Main {
 			g.drawString("Zerfall", 25, 25);
 			g.dispose();
 		}
+	}
+	
+	static Map<String, Object> parseXML(String path, String elementTag, String id) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		try {
+			NodeList nList = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path)).getDocumentElement().getElementsByTagName(elementTag);
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				Element eElement = (Element) nNode;
+				if (eElement.getAttribute("id") == id) {
+					data.put("id", eElement.getAttribute("id"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
 	}
 }
