@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 <guns>
-	<gun name = "AK-47" id = "ak">
+	<gun id = "ak">
+	     <name> AK-47 </name>
 		<mode> full </mode>
 		<rpm> 600 </rpm>
 		<eti> 99 </eti>

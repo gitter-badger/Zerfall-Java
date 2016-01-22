@@ -77,7 +77,7 @@ class Main {
 		}
 	}
 	
-	static Map<String, Object> parseXML(String path, String elementTag, String id) {
+	static void parseXML(String path, String elementTag, String id) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
 			NodeList nList = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path)).getDocumentElement().getElementsByTagName(elementTag);
@@ -91,6 +91,5 @@ class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return data;
 	}
 }
