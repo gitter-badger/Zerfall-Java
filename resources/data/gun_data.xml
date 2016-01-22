@@ -49,7 +49,7 @@
 		<eti> 49 </eti>
 		<clip> 7 </clip>
 	</gun>
-	<gun name = "Thompson" id = "m1928">
+	<gun name = "M1928" id = "thom">
 		<mode> full </mode>
 		<rpm> 700 </rpm>
 		<eti> 63 </eti>
