@@ -8,17 +8,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("serial")
 class Main {
@@ -54,7 +57,7 @@ class Main {
 		});
 		logicTimer.start();
 		drawTimer.start();
-		new Weapon("ak");
+		parseXML("resources/data/gun_data.xml", "gun");
 	}
 
 	static class Sheet extends JPanel {
@@ -76,19 +79,29 @@ class Main {
 			g.dispose();
 		}
 	}
-	
-	static void parseXML(String path, String elementTag, String id) {
-		Map<String, Object> data = new HashMap<String, Object>();
+
+	static void parseXML(String path, String tagName) {
 		try {
-			NodeList nList = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path)).getDocumentElement().getElementsByTagName(elementTag);
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(new File(path));
+			doc.getDocumentElement().normalize();
+			NodeList nList = doc.getElementsByTagName(tagName);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
-				Element eElement = (Element) nNode;
-				if (eElement.getAttribute("id") == id) {
-					data.put("id", eElement.getAttribute("id"));
+				System.out.println("\nCurrent Element :" + nNode.getNodeName());
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+
+					System.out.println(eElement.getAttribute("id"));
+					System.out.println(eElement.getAttribute("name"));
+					System.out.println(eElement.getElementsByTagName("eti").item(0).getTextContent());
+					System.out.println(eElement.getElementsByTagName("clip").item(0).getTextContent());
+					if (eElement.hasAttribute("type"))
+					System.out.println(eElement.getElementsByTagName("type").item(0).getTextContent());
 				}
 			}
-		} catch (Exception e) {
+		} catch (SAXException | IOException | ParserConfigurationException e) {
 			e.printStackTrace();
 		}
 	}
