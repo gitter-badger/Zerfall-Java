@@ -1,5 +1,6 @@
 package exosoft.Zerfall;
 
+import java.util.Map;
 
 public class Weapon extends Avatar {
     Sound gunshot;
@@ -22,8 +23,13 @@ public class Weapon extends Avatar {
         fireRate = 0.0;
         name = null;
     }
-    Weapon(String name, String id, int clipSize, int damage, int RPM, weaponType type) {
-    	clipRounds = clipSize;
-    	fireRate = RPM / 60 * logicRate;
+    Weapon(Map<String, Object> data) {
+    	clipRounds = clipSize = (int) data.get("clip");
+    	fireRate = ((int) data.get("rpm")) / (60 * logicRate);
+    	damage = (int) data.get("eti");
+    	type = weaponType.valueOf(data.get("type").toString());
+    	name = data.get("name").toString();
+    	reload = new Sound("resources/sounds/guns/" + data.get("id").toString() + "_reload.au");
+    	gunshot = new Sound("resources/sounds/guns/" + data.get("id").toString() + "gunshot.au");
 	}
 }

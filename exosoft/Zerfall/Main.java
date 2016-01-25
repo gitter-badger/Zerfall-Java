@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -19,6 +21,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -52,12 +55,14 @@ class Main {
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new Window("Zerfall", 1920, 1080, false);
+				new Window("Zerfall", 1136, 640, false);
 			}
 		});
 		logicTimer.start();
 		drawTimer.start();
-		parseXML("resources/data/gun_data.xml", "gun");
+		Map<String, Object> gunData = parseXMLElement("resources/data/gun_data.xml", "gun", "id", "ak");
+		System.out.println(gunData.keySet());
+		System.out.println(gunData.entrySet());
 	}
 
 	static class Sheet extends JPanel {
@@ -80,8 +85,9 @@ class Main {
 		}
 	}
 
-	static void parseXML(String path, String tagName) {
+	static Map<String, Object> parseXMLElement(String path, String tagName, String IDTag, String elementID) {
 		try {
+			Map<String, Object> XMLData = new HashMap<>();
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(new File(path));
@@ -89,20 +95,32 @@ class Main {
 			NodeList nList = doc.getElementsByTagName(tagName);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
-				System.out.println("\nCurrent Element :" + nNode.getNodeName());
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
-
-					System.out.println(eElement.getAttribute("id"));
-					System.out.println(eElement.getAttribute("name"));
-					System.out.println(eElement.getElementsByTagName("eti").item(0).getTextContent());
-					System.out.println(eElement.getElementsByTagName("clip").item(0).getTextContent());
-					if (eElement.hasAttribute("type"))
-					System.out.println(eElement.getElementsByTagName("type").item(0).getTextContent());
+					NamedNodeMap attributes = eElement.getAttributes();
+					boolean correctItem = false;
+					for (int index = 0; index < attributes.getLength(); index++) {
+						System.out.println(attributes.item(index));
+						if (!correctItem) {
+							correctItem = (attributes.item(index).getNodeName().equals(IDTag) && attributes.item(index).getTextContent().equals(elementID));
+						}
+						XMLData.put(attributes.item(index).getNodeName(), attributes.item(index).getTextContent());
+					}
+					if (correctItem) {
+						if (eElement.hasChildNodes()) {
+							NodeList nodeElements = eElement.getChildNodes();
+							for (int eIndex = 0; eIndex < nodeElements.getLength() - 1; eIndex++) {
+								XMLData.put(nodeElements.item(eIndex).getNodeName(),
+										nodeElements.item(eIndex).getTextContent());
+							}
+							return XMLData;
+						}
+					}
 				}
 			}
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 }
