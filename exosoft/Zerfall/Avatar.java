@@ -13,12 +13,42 @@ public class Avatar extends Sprite {
 	double yVel = 0;
 	int spriteNum = 0;
 	boolean collision[] = new boolean[5];
+	Gun currentGun = new Gun();
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
+		currentGun = new akfs();
 	}
 
-	void logic() {
+	public int getxPos() {
+		return (int) Math.round(xPos);
+	}
+
+	public void setxPos(double xPos) {
+		if (xPos > 0 && xPos < map.getWidth()) {
+			this.xPos = xPos;
+		}
+	}
+
+	public int getyPos() {
+		return (int) Math.round(yPos);
+	}
+
+	public void setyPos(double yPos) {
+		if (yPos > 0 && yPos < map.getHeight()) {
+			this.yPos = yPos;
+		}
+	}
+
+	public Gun getCurrentGun() {
+		return currentGun;
+	}
+
+	public void setCurrentGun(Gun currentGun) {
+		this.currentGun = currentGun;
+	}
+
+	synchronized void logic() {
 		int c;
 		for (int i = 0; i < 5; i++)
 			collision[i] = false;
@@ -76,7 +106,6 @@ public class Avatar extends Sprite {
 		}
 		if (collision[1]) {
 			yVel = 0;
-			spriteNum -= spriteNum % 2;
 		} else {
 			yVel += .4;
 		}
@@ -84,19 +113,39 @@ public class Avatar extends Sprite {
 			if (!collision[3]) {
 				xPos -= 4;
 			}
-			switch (spriteNum) {
-			case 2:
-			case 3:
-			case 6:
-			case 7:
-				spriteNum -= 2;
-				break;
-			}
 		}
 		if (keys[KeyEvent.VK_D]) {
 			if (!collision[4]) {
 				xPos += 4;
 			}
+		}
+		if (keys[KeyEvent.VK_W]) {
+			if (collision[0]) {
+				yVel = -4;
+			} else if (collision[1]) {
+				yVel -= 12;
+			}
+		}
+		if (collision[2]) {
+			yVel = Math.abs(yVel);
+		}
+		yPos += yVel;
+	}
+
+	synchronized void gunLogic() {
+		if (keys[KeyEvent.VK_SPACE] && !currentGun.boltRotation.isRunning()) {
+			currentGun.fire();
+		}
+		if (keys[KeyEvent.VK_R] && !currentGun.reloadMag.isRunning()) {
+			currentGun.reload();
+		}
+	}
+
+	synchronized void visualLogic() {
+		if (collision[1]) {
+			spriteNum -= spriteNum % 2;
+		}
+		if (keys[KeyEvent.VK_D]) {
 			switch (spriteNum) {
 			case 0:
 			case 1:
@@ -106,26 +155,22 @@ public class Avatar extends Sprite {
 				break;
 			}
 		}
-		if (keys[KeyEvent.VK_W]) {
-			if (collision[0]) {
-				yVel = -4;
-			} else if (collision[1]) {
-				yVel -= 12;
-				spriteNum += (spriteNum + 1) % 2;
+		if (keys[KeyEvent.VK_A]) {
+			switch (spriteNum) {
+			case 2:
+			case 3:
+			case 6:
+			case 7:
+				spriteNum -= 2;
+				break;
 			}
 		}
-		if (keys[KeyEvent.VK_SPACE] && spriteNum < 4) {
-			spriteNum += 4;
-		} else if (spriteNum > 3) {
-			spriteNum -= 4;
+		if (keys[KeyEvent.VK_W] && collision[1]) {
+			spriteNum += (spriteNum + 1) % 2;
 		}
-		if (collision[2]) {
-			yVel = Math.abs(yVel);
-		}
-		yPos += yVel;
 	}
 
-	public void openDoor(int x, int y) {
+	synchronized void openDoor(int x, int y) {
 		x /= 10;
 		y /= 10;
 		int h = 0;
@@ -147,5 +192,11 @@ public class Avatar extends Sprite {
 		foregroundGraphics.setComposite(AlphaComposite.Clear);
 		foregroundGraphics.fillRect(x * 10, y * 10, 11, h * 10 + 1);
 		foregroundGraphics.dispose();
+	}
+
+	class akfs extends Gun {
+		akfs() {
+			super(Main.parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
+		}
 	}
 }

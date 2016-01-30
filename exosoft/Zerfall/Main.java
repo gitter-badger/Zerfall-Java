@@ -26,43 +26,49 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import kuusisto.tinysound.TinySound;
+
 @SuppressWarnings("serial")
 class Main {
-	static int logicRate = 120, drawRate = 60;
+	static int logicRate, drawRate;
 	static boolean keys[] = new boolean[256];
 	static BufferedImage map = null, foreground = null, bitmap = null;
-	static Sheet sheet = new Sheet();
-	static Avatar player = new Avatar();
+	static Sheet sheet;
+	static Avatar player;
 	static Timer drawTimer, logicTimer;
 
 	public static void main(String[] args) {
-		drawTimer = new Timer(1000 / drawRate, new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				sheet.repaint();
-			}
-		});
-		logicTimer = new Timer(1000 / logicRate, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				player.logic();
-			}
-		});
 		try {
+			TinySound.init();
+			sheet = new Sheet();
+			logicRate = 120;
+			drawRate = 60;
+			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
 			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
+			drawTimer = new Timer(1000 / drawRate, new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					player.visualLogic();
+					sheet.repaint();
+				}
+			});
+			logicTimer = new Timer(1000 / logicRate, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					player.logic();
+					player.gunLogic();
+				}
+			});
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					new Window("Zerfall", 1136, 640, false);
+				}
+			});
+			logicTimer.start();
+			drawTimer.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new Window("Zerfall", 1136, 640, false);
-			}
-		});
-		logicTimer.start();
-		drawTimer.start();
-		Map<String, Object> gunData = parseXMLElement("resources/data/gun_data.xml", "gun", "id", "ak");
-		System.out.println(gunData.keySet());
-		System.out.println(gunData.entrySet());
 	}
 
 	static class Sheet extends JPanel {
@@ -72,15 +78,18 @@ class Main {
 			Graphics2D g = (Graphics2D) g1;
 			g.setColor(Color.black);
 			g.fillRect(0, 0, getWidth(), getHeight());
-			g.translate((int) -(player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
-					(int) -(player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
+			g.translate((int) -(player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+					(int) -(player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
 			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
-			g.drawImage(player.sprites[player.spriteNum], (int) player.xPos, (int) player.yPos, null);
+			g.drawImage(player.sprites[player.spriteNum], player.getxPos(), player.getyPos(), null);
 			g.drawImage(foreground, 0, 0, null);
 			g.setColor(Color.blue);
-			g.translate((int) (player.xPos + player.sprites[0].getWidth() / 2 - getWidth() / 2),
-					(int) (player.yPos + player.sprites[0].getHeight() / 2 - getHeight() / 2));
-			g.drawString("Zerfall", 25, 25);
+			g.translate((int) (player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+					(int) (player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
+			g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
+			if (player.spriteNum > 3) {
+				player.spriteNum -= 4;
+			}
 			g.dispose();
 		}
 	}
@@ -102,16 +111,18 @@ class Main {
 					for (int index = 0; index < attributes.getLength(); index++) {
 						System.out.println(attributes.item(index));
 						if (!correctItem) {
-							correctItem = (attributes.item(index).getNodeName().equals(IDTag) && attributes.item(index).getTextContent().equals(elementID));
+							correctItem = (attributes.item(index).getNodeName().equals(IDTag)
+									&& attributes.item(index).getTextContent().equals(elementID));
 						}
-						XMLData.put(attributes.item(index).getNodeName(), attributes.item(index).getTextContent());
+						XMLData.put(attributes.item(index).getNodeName(),
+								attributes.item(index).getTextContent().trim());
 					}
 					if (correctItem) {
 						if (eElement.hasChildNodes()) {
 							NodeList nodeElements = eElement.getChildNodes();
 							for (int eIndex = 0; eIndex < nodeElements.getLength() - 1; eIndex++) {
-								XMLData.put(nodeElements.item(eIndex).getNodeName(),
-										nodeElements.item(eIndex).getTextContent());
+								XMLData.put(nodeElements.item(eIndex).getNodeName().trim(),
+										nodeElements.item(eIndex).getTextContent().trim());
 							}
 							return XMLData;
 						}

@@ -1,97 +1,97 @@
 <?xml version='1.0'?>
 <guns>
-	<gun name="AK-47" id ="ak">
-		<mode> full </mode>
+	<gun name="AK-47" id ="akfs">
+		<type> full </type>
 		<rpm> 600 </rpm>
 		<eti> 99 </eti>
 		<clip> 30 </clip>
 	</gun>
 	<gun name = "AUG" id = "aug">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 715 </rpm>
 		<eti> 48 </eti>
 		<clip> 30 </clip>
 	</gun>
 	<gun name = "Dragunov" id = "drgv">
-		<mode> semi </mode>
+		<type> semi </type>
 		<rpm> 30 </rpm>
 		<eti> 192 </eti>
 		<clip> 10 </clip>
 	</gun>
 	<gun name = "FAL" id = "fal">
-		<mode> semi </mode>
+		<type> semi </type>
 		<rpm> 75 </rpm>
 		<eti> 169 </eti>
 		<clip> 30 </clip>
 	</gun>
 	<gun name = "FAMAS" id = "fms">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 950 </rpm>
 		<eti> 47 </eti>
 		<clip> 25 </clip>
 	</gun>
 	<gun name = "G3" id = "hkg3">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 550 </rpm>
 		<eti> 154 </eti>
 		<clip> 20 </clip>
 	</gun>
 	<gun name = "L2A3" id = "l2a3">
-		<mode> bolt </mode>
+		<type> bolt </type>
 		<rpm> 6 </rpm>
 		<eti> 145 </eti>
 		<clip> 5 </clip>
 	</gun>
 	<gun name = "M1911" id = "colt">
-		<mode> semi </mode>
+		<type> semi </type>
 		<rpm> 25 </rpm>
 		<eti> 49 </eti>
 		<clip> 7 </clip>
 	</gun>
 	<gun name = "M1928" id = "thom">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 700 </rpm>
 		<eti> 63 </eti>
 		<clip> 50 </clip>
 	</gun>
 	<gun name = "M60" id = "m60">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 575 </rpm>
 		<eti> 175 </eti>
 		<clip> 100 </clip>
 	</gun>
 	<gun name = "M9" id = "m9">
-		<mode> semi </mode>
+		<type> semi </type>
 		<rpm> 40 </rpm>
 		<eti> 34 </eti>
 		<clip> 10 </clip>
 	</gun>
 	<gun name = "MP40" id = "mp40">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 500 </rpm>
 		<eti> 34 </eti>
 		<clip> 32 </clip>
 	</gun>
 	<gun name = "PPK" id = "ppk">
-		<mode> semi </mode>
+		<type> semi </type>
 		<rpm> 15 </rpm>
 		<eti> 6 </eti>
 		<clip> 8 </clip>
 	</gun>
 	<gun name = "RPK" id = "rpk">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 600 </rpm>
 		<eti> 108 </eti>
 		<clip> 75 </clip>
 	</gun>
 	<gun name = "Stoner 63" id = "s63">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 850 </rpm>
 		<eti> 50 </eti>
 		<clip> 150 </clip>
 	</gun>
 		<gun name = "Uzi" id = "uzi">
-		<mode> full </mode>
+		<type> full </type>
 		<rpm> 600 </rpm>
 		<eti> 38 </eti>
 		<clip> 32 </clip>
