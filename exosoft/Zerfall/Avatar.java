@@ -133,11 +133,20 @@ public class Avatar extends Sprite {
 	}
 
 	synchronized void gunLogic() {
-		if (keys[KeyEvent.VK_SPACE] && !currentGun.boltRotation.isRunning()) {
+		if (keys[KeyEvent.VK_SPACE] && !currentGun.fullFire.isRunning()) {
 			currentGun.fire();
 		}
 		if (keys[KeyEvent.VK_R] && !currentGun.reloadMag.isRunning()) {
 			currentGun.reload();
+		}
+		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning()) {
+			if (currentGun.getClass() == akfs.class) {
+				setCurrentGun(new aug());
+			} else if (currentGun.getClass() == aug.class) {
+				setCurrentGun(new drgv());
+			} else if (currentGun.getClass() == drgv.class) {
+				setCurrentGun(new akfs());
+			}
 		}
 	}
 
@@ -196,7 +205,19 @@ public class Avatar extends Sprite {
 
 	class akfs extends Gun {
 		akfs() {
-			super(Main.parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
+		}
+	}
+	
+	class aug extends Gun {
+		aug() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
+		}
+	}
+	
+	class drgv extends Gun {
+		drgv() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "drgv"));
 		}
 	}
 }

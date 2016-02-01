@@ -1,5 +1,6 @@
 package exosoft.Zerfall;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -19,7 +20,8 @@ public class Gun extends Main {
 	weaponType type;
 	String name;
 	int boltPosition;
-	Timer boltRotation, reloadMag;
+	Timer fullFire, reloadMag;
+	Timer semiFire;
 
 	enum weaponType {
 		FULL, SEMI, BOLT
@@ -46,7 +48,7 @@ public class Gun extends Main {
 					.loadMusic(new File("resources/sounds/guns/" + data.get("id").toString() + "_reload.au"));
 			gunshotSND = TinySound
 					.loadSound(new File("resources/sounds/guns/" + data.get("id").toString() + "_gunshot.au"));
-			boltRotation = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
+			fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (Main.player.spriteNum < 4) {
@@ -55,10 +57,21 @@ public class Gun extends Main {
 					gunshotSND.play();
 					clipRounds--;
 					if (!Main.keys[KeyEvent.VK_SPACE] || clipRounds < 1 || !reloadMag.isRunning()) {
-						boltRotation.stop();
+						fullFire.stop();
 					}
 				}
 			});
+			semiFire = new Timer(0, new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (Main.player.spriteNum < 4) {
+						Main.player.spriteNum += 4;
+					}
+					gunshotSND.play();
+					clipRounds--;
+				}
+			});
+			semiFire.setRepeats(false);
 			reloadMag = new Timer(100, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -75,11 +88,17 @@ public class Gun extends Main {
 	}
 
 	void fire() {
-		if (getClipRounds() > 0 && !reloadMag.isRunning()) {
-			boltRotation.start();
+		if (type == weaponType.FULL) {
+			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+				fullFire.start();
+			}
+		} else if (type == weaponType.SEMI) {
+			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+				semiFire.start();
+			}
 		}
 	}
-	
+
 	void reload() {
 		reloadSND.play(false);
 		reloadMag.start();
