@@ -8,12 +8,13 @@ import java.awt.event.KeyEvent;
 
 public class Avatar extends Sprite {
 	Rectangle bounds = new Rectangle();
-	double xPos = 4500;
-	double yPos = 1240;
-	double yVel = 0;
-	int spriteNum = 0;
-	boolean collision[] = new boolean[5];
-	Gun currentGun = new Gun();
+	private Gun[] gunSwitcher = {new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3()};
+	private double xPos = 4500;
+	private double yPos = 1240;
+	private double yVel = 0;
+	private int spriteNum = 0;
+	private boolean collision[] = new boolean[5];
+	private Gun currentGun = new Gun();
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
@@ -27,6 +28,10 @@ public class Avatar extends Sprite {
 	public void setxPos(double xPos) {
 		if (xPos > 0 && xPos < map.getWidth()) {
 			this.xPos = xPos;
+		} else if (xPos < 0) {
+			this.xPos = 0;
+		} else if (xPos > map.getWidth() - 1) {
+			this.xPos = map.getWidth() - 1;
 		}
 	}
 
@@ -35,8 +40,12 @@ public class Avatar extends Sprite {
 	}
 
 	public void setyPos(double yPos) {
-		if (yPos > 0 && yPos < map.getHeight()) {
+		if (yPos > -1 && yPos < map.getHeight()) {
 			this.yPos = yPos;
+		} else if (yPos < 0) {
+			this.yPos = 0;
+		} else if (yPos > map.getHeight() - 1) {
+			this.yPos = map.getHeight() - 1;
 		}
 	}
 
@@ -140,12 +149,10 @@ public class Avatar extends Sprite {
 			currentGun.reload();
 		}
 		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning()) {
-			if (currentGun.getClass() == akfs.class) {
-				setCurrentGun(new aug());
-			} else if (currentGun.getClass() == aug.class) {
-				setCurrentGun(new drgv());
-			} else if (currentGun.getClass() == drgv.class) {
-				setCurrentGun(new akfs());
+			if (gunSwitcher[gunSwitcher.length - 2] == getCurrentGun()) {
+				currentGun = gunSwitcher[0];
+			} else {
+				currentGun = gunSwitcher[1];
 			}
 		}
 	}
@@ -208,25 +215,34 @@ public class Avatar extends Sprite {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
 		}
 	}
+
 	class aug extends Gun {
 		aug() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
 		}
 	}
-	
+
 	class drgv extends Gun {
 		drgv() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "drgv"));
 		}
 	}
+
 	class fal extends Gun {
-	      fal() {
-	           super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fal"));
-	      }
-      }
-      class fms extends Gun {
-            fms() {
-                 super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fms"));
-            }
-      }
+		fal() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fal"));
+		}
+	}
+
+	class fms extends Gun {
+		fms() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fms"));
+		}
+	}
+
+	class hkg3 extends Gun {
+		hkg3() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "hkg3"));
+		}
+	}
 }
