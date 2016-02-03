@@ -150,10 +150,14 @@ public class Avatar extends Sprite {
 		}
 		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning()) {
 			if (gunSwitcher[gunSwitcher.length - 2] == getCurrentGun()) {
-				currentGun = gunSwitcher[0];
+				setCurrentGun(gunSwitcher[0]);
 			} else {
-				currentGun = gunSwitcher[1];
-			}
+				for (int i = 0; i < gunSwitcher.length - 1; i++) {
+					if (gunSwitcher[i] == getCurrentGun()) {
+						setCurrentGun(gunSwitcher[i + 1]);
+					}
+					
+				}
 		}
 	}
 
