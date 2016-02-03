@@ -208,7 +208,6 @@ public class Avatar extends Sprite {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
 		}
 	}
-	
 	class aug extends Gun {
 		aug() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
@@ -220,4 +219,14 @@ public class Avatar extends Sprite {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "drgv"));
 		}
 	}
+	class fal extends Gun {
+	      fal() {
+	           super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fal"));
+	      }
+      }
+      class fms extends Gun {
+            fms() {
+                 super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fms"));
+            }
+      }
 }
