@@ -18,7 +18,7 @@ public class Avatar extends Sprite {
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
-		currentGun = new akfs();
+		currentGun = new colt();
 	}
 
 	public int getxPos() {
@@ -223,6 +223,12 @@ public class Avatar extends Sprite {
 	class aug extends Gun {
 		aug() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
+		}
+	}
+	
+	class colt extends Gun {
+		colt() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "colt"));
 		}
 	}
 
