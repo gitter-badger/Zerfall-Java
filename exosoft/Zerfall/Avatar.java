@@ -5,20 +5,34 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Timer;
 
 public class Avatar extends Sprite {
 	Rectangle bounds = new Rectangle();
-	private Gun[] gunSwitcher = {new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3()};
+	private Gun[] gunSwitcher = { new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3(), new colt(), new m60() };
 	private double xPos = 4500;
 	private double yPos = 1240;
 	private double yVel = 0;
 	private int spriteNum = 0;
 	private boolean collision[] = new boolean[5];
 	private Gun currentGun = new Gun();
+	Timer swapGun;
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
 		currentGun = new colt();
+		swapGun = new Timer(250, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				currentGun = currentGun.swap(getCurrentGun(), gunSwitcher);
+				if (!keys[KeyEvent.VK_1]) {
+					swapGun.stop();
+				}
+			}
+		});
 	}
 
 	public int getxPos() {
@@ -55,6 +69,14 @@ public class Avatar extends Sprite {
 
 	public void setCurrentGun(Gun currentGun) {
 		this.currentGun = currentGun;
+	}
+
+	public int getSpriteNum() {
+		return spriteNum;
+	}
+
+	public void setSpriteNum(int spriteNum) {
+		this.spriteNum = spriteNum;
 	}
 
 	synchronized void logic() {
@@ -148,45 +170,37 @@ public class Avatar extends Sprite {
 		if (keys[KeyEvent.VK_R] && !currentGun.reloadMag.isRunning()) {
 			currentGun.reload();
 		}
-		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning()) {
-			if (gunSwitcher[gunSwitcher.length - 2] == getCurrentGun()) {
-				setCurrentGun(gunSwitcher[0]);
-			} else {
-				for (int i = 0; i < gunSwitcher.length - 1; i++) {
-					if (gunSwitcher[i] == getCurrentGun()) {
-						setCurrentGun(gunSwitcher[i + 1]);
-					}
-					
-				}
+		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
+			swapGun.start();
 		}
 	}
 
 	synchronized void visualLogic() {
 		if (collision[1]) {
-			spriteNum -= spriteNum % 2;
+			setSpriteNum(getSpriteNum() - getSpriteNum() % 2);
 		}
 		if (keys[KeyEvent.VK_D]) {
-			switch (spriteNum) {
+			switch (getSpriteNum()) {
 			case 0:
 			case 1:
 			case 4:
 			case 5:
-				spriteNum += 2;
+				setSpriteNum(getSpriteNum() + 2);
 				break;
 			}
 		}
 		if (keys[KeyEvent.VK_A]) {
-			switch (spriteNum) {
+			switch (getSpriteNum()) {
 			case 2:
 			case 3:
 			case 6:
 			case 7:
-				spriteNum -= 2;
+				setSpriteNum(getSpriteNum() - 2);
 				break;
 			}
 		}
 		if (keys[KeyEvent.VK_W] && collision[1]) {
-			spriteNum += (spriteNum + 1) % 2;
+			setSpriteNum(getSpriteNum() + (getSpriteNum() + 1) % 2);
 		}
 	}
 
@@ -225,7 +239,7 @@ public class Avatar extends Sprite {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
 		}
 	}
-	
+
 	class colt extends Gun {
 		colt() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "colt"));
@@ -253,6 +267,12 @@ public class Avatar extends Sprite {
 	class hkg3 extends Gun {
 		hkg3() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "hkg3"));
+		}
+	}
+	
+	class m60 extends Gun {
+		m60() {
+			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
 		}
 	}
 }

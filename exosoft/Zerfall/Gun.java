@@ -1,6 +1,5 @@
 package exosoft.Zerfall;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,8 +19,9 @@ public class Gun extends Main {
 	weaponType type;
 	String name;
 	int boltPosition;
-	Timer fullFire, reloadMag;
+	Timer fullFire, reloadMag, swapGun;
 	Timer semiFire;
+	boolean canFire = true;
 
 	enum weaponType {
 		FULL, SEMI, BOLT
@@ -51,8 +51,8 @@ public class Gun extends Main {
 			fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (Main.player.spriteNum < 4) {
-						Main.player.spriteNum += 4;
+					if (Main.player.getSpriteNum() < 4) {
+						Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
 					}
 					gunshotSND.play();
 					clipRounds--;
@@ -61,17 +61,23 @@ public class Gun extends Main {
 					}
 				}
 			});
-			semiFire = new Timer(0, new ActionListener() {
+			semiFire = new Timer(10, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (Main.player.spriteNum < 4) {
-						Main.player.spriteNum += 4;
+					if (keys[KeyEvent.VK_SPACE] && canFire == true) {
+						if (Main.player.getSpriteNum() < 4) {
+							Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
+						}
+						gunshotSND.play();
+						clipRounds--;
+						canFire = false;
 					}
-					gunshotSND.play();
-					clipRounds--;
+					if (keys[KeyEvent.VK_SPACE] == false) {
+						canFire = true;
+						semiFire.stop();
+					}
 				}
 			});
-			semiFire.setRepeats(false);
 			reloadMag = new Timer(100, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -93,7 +99,7 @@ public class Gun extends Main {
 				fullFire.start();
 			}
 		} else if (type == weaponType.SEMI) {
-			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+			if (getClipRounds() > 0 && !reloadMag.isRunning() && canFire == true) {
 				semiFire.start();
 			}
 		}
@@ -142,6 +148,21 @@ public class Gun extends Main {
 
 	public void setFireRate(double fireRate) {
 		this.fireRate = fireRate;
+	}
+
+	public Gun swap(Gun gun, Gun[] gunSwitcher) {
+		Class<? extends Gun> gunClass = gun.getClass();
+		if (gunSwitcher[gunSwitcher.length - 1].getClass() == gunClass) {
+			return gunSwitcher[0];
+		} else {
+			for (int i = 0; i < gunSwitcher.length - 1; i++) {
+				if (gunSwitcher[i].getClass() == gunClass) {
+					return gunSwitcher[i + 1];
+				}
+
+			}
+		}
+		return gun;
 	}
 
 }

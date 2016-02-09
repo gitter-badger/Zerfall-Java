@@ -81,14 +81,15 @@ class Main {
 			g.translate((int) -(player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
 					(int) -(player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
 			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
-			g.drawImage(player.sprites[player.spriteNum], player.getxPos(), player.getyPos(), null);
+			g.drawImage(player.sprites[player.getSpriteNum()], player.getxPos(), player.getyPos(), null);
 			g.drawImage(foreground, 0, 0, null);
 			g.setColor(Color.blue);
 			g.translate((int) (player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
 					(int) (player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
 			g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
-			if (player.spriteNum > 3) {
-				player.spriteNum -= 4;
+			g.drawString(player.getCurrentGun().getName(), getWidth() - 100, getHeight() - 100);
+			if (player.getSpriteNum() > 3) {
+				player.setSpriteNum(player.getSpriteNum() - 4);
 			}
 			g.dispose();
 		}
