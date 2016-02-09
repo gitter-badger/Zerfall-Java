@@ -30,6 +30,7 @@ public class Window extends JFrame implements KeyListener, MouseListener {
            addKeyListener(this);
            addMouseListener(this);
       }
+      
       public Window(int width, int height) {
           super();
           setSize(width, height);
@@ -71,21 +72,21 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = true;
+		    Main.keys[e.getKeyCode()] = true;
 		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = true;
+	     if (e.getKeyCode() < 256) {
+		     Main.keys[e.getKeyCode()] = true;
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = false;
+	     if (e.getKeyCode() < 256) {
+		     Main.keys[e.getKeyCode()] = false;
 		}
 	}
 

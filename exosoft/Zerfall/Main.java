@@ -61,7 +61,7 @@ class Main {
 			});
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					new Window("Zerfall", 1136, 640, false);
+					new Window("Zerfall", 1280, 720, false);
 				}
 			});
 			logicTimer.start();
@@ -98,9 +98,7 @@ class Main {
 	static Map<String, Object> parseXMLElement(String path, String tagName, String IDTag, String elementID) {
 		try {
 			Map<String, Object> XMLData = new HashMap<>();
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(new File(path));
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path));
 			doc.getDocumentElement().normalize();
 			NodeList nList = doc.getElementsByTagName(tagName);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -127,6 +125,8 @@ class Main {
 							}
 							return XMLData;
 						}
+					} else {
+					    throw new Exception("Element not found in given XML file.");
 					}
 				}
 			}
