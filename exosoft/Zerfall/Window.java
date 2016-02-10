@@ -1,4 +1,4 @@
-package exosoft.Zerfall;
+package exosoft.util;
 
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
