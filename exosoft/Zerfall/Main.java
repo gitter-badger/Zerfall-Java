@@ -61,7 +61,9 @@ class Main {
 			});
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					new Window("Zerfall", 1280, 720, false);
+					Window window = new Window("Zerfall", 1280, 720, false);
+					window.useMouse(true);
+					window.useKeys(true);
 				}
 			});
 			logicTimer.start();

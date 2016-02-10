@@ -16,8 +16,6 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 		add(Main.sheet);
 		setVisible(true);
 		setResizable(resizable);
-		addKeyListener(this);
-		addMouseListener(this);
 	}
 
      public Window(String title, int width, int height) throws HeadlessException {
@@ -27,8 +25,6 @@ public class Window extends JFrame implements KeyListener, MouseListener {
            add(Main.sheet);
            setVisible(true);
            setResizable(false);
-           addKeyListener(this);
-           addMouseListener(this);
       }
       
       public Window(int width, int height) {
@@ -42,6 +38,21 @@ public class Window extends JFrame implements KeyListener, MouseListener {
           addMouseListener(this);
       }
       
+      public void useMouse(boolean status) {
+          if (status) {
+              addMouseListener(this);
+          } else {
+              removeMouseListener(this);
+          }
+      }
+      
+      public void useKeys(boolean status) {
+          if (status) {
+              addKeyListener(this);
+          } else {
+              removeKeyListener(this);
+          }
+      }
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		
