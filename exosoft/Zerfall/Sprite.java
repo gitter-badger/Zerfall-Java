@@ -11,6 +11,7 @@ public abstract class Sprite extends Main {
 	BufferedImage[] sprites;
 	int spriteWidth = 0;
 	int spriteHeight = 0;
+	int spriteNum;
 	
 	public enum SheetType {
 		SINGLE,

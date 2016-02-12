@@ -64,7 +64,7 @@ public class Gun extends Main {
 			semiFire = new Timer(10, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (keys[KeyEvent.VK_SPACE] && canFire == true) {
+					if (keys[KeyEvent.VK_SPACE]) {
 						if (Main.player.getSpriteNum() < 4) {
 							Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
 						}
@@ -72,7 +72,7 @@ public class Gun extends Main {
 						clipRounds--;
 						canFire = false;
 					}
-					if (keys[KeyEvent.VK_SPACE] == false) {
+					if (!keys[KeyEvent.VK_SPACE]) {
 						canFire = true;
 						semiFire.stop();
 					}
@@ -94,12 +94,13 @@ public class Gun extends Main {
 	}
 
 	void fire() {
-		if (type == weaponType.FULL) {
-			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+	     if (getClipRounds > 0 && !reloadMag.isRunning()) {
+	          switch (type) {
+	          case weaponType.FULL:
 				fullFire.start();
-			}
-		} else if (type == weaponType.SEMI) {
-			if (getClipRounds() > 0 && !reloadMag.isRunning() && canFire == true) {
+				break;
+		     case weaponType.SEMI:
+			     if (canFire) {
 				semiFire.start();
 			}
 		}
@@ -164,5 +165,4 @@ public class Gun extends Main {
 		}
 		return gun;
 	}
-
 }

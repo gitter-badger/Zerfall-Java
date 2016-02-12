@@ -16,10 +16,8 @@ public class Avatar extends Sprite {
 	private double xPos = 4500;
 	private double yPos = 1240;
 	private double yVel = 0;
-	private int spriteNum = 0;
 	private boolean collision[] = new boolean[5];
 	private Gun currentGun = new Gun();
-	Timer swapGun;
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
@@ -80,10 +78,38 @@ public class Avatar extends Sprite {
 	}
 
 	synchronized void logic() {
-		int c;
-		for (int i = 0; i < 5; i++)
-			collision[i] = false;
-		lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
+		collision = collision();
+		if (collision[1]) {
+			yVel = 0;
+		} else {
+			yVel += .4;
+		}
+		if (keys[KeyEvent.VK_A]) {
+			if (!collision[3]) {
+				xPos -= 4;
+			}
+		}
+		if (keys[KeyEvent.VK_D]) {
+			if (!collision[4]) {
+				xPos += 4;
+			}
+		}
+		if (keys[KeyEvent.VK_W]) {
+			if (collision[0]) {
+				yVel = -4;
+			} else if (collision[1]) {
+				yVel -= 12;
+			}
+		}
+		if (collision[2]) {
+			yVel = Math.abs(yVel);
+		}
+		yPos += yVel;
+	}
+     boolean[] collision() {
+          int c;
+          boolean[] collision = new boolean[5];
+          lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
 			for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 10) {
 				c = bitmap.getRGB((int) x / 10, (int) y / 10);
 				switch (c) {
@@ -135,42 +161,16 @@ public class Avatar extends Sprite {
 				}
 			}
 		}
-		if (collision[1]) {
-			yVel = 0;
-		} else {
-			yVel += .4;
-		}
-		if (keys[KeyEvent.VK_A]) {
-			if (!collision[3]) {
-				xPos -= 4;
-			}
-		}
-		if (keys[KeyEvent.VK_D]) {
-			if (!collision[4]) {
-				xPos += 4;
-			}
-		}
-		if (keys[KeyEvent.VK_W]) {
-			if (collision[0]) {
-				yVel = -4;
-			} else if (collision[1]) {
-				yVel -= 12;
-			}
-		}
-		if (collision[2]) {
-			yVel = Math.abs(yVel);
-		}
-		yPos += yVel;
-	}
-
-	synchronized void gunLogic() {
+		return collision;
+     }
+     synchronized void gunLogic() {
 		if (keys[KeyEvent.VK_SPACE] && !currentGun.fullFire.isRunning()) {
 			currentGun.fire();
 		}
 		if (keys[KeyEvent.VK_R] && !currentGun.reloadMag.isRunning()) {
 			currentGun.reload();
 		}
-		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
+		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
 			swapGun.start();
 		}
 	}

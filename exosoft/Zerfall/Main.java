@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,32 +15,35 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 class Main {
-	static int logicRate, drawRate;
-	static boolean keys[] = new boolean[256];
-	static BufferedImage map = null, foreground = null, bitmap = null;
+	final static int logicRate;
+	final static int drawRate;
+	static boolean[] keys;
+	static BufferedImage map;
+	static BufferedImage foreground;
+	static BufferedImage bitmap;
 	static Sheet sheet;
 	static Avatar player;
-	static Timer drawTimer, logicTimer;
-	static boolean itemsLoaded;
+	static Timer drawTimer
+	static Timer logicTimer;
+	private boolean itemsLoaded;
 
 	public static void main(String[] args) {
 		try {
 			TinySound.init();
 			logicRate = 120;
 			drawRate = 60;
+			keys = new boolean[256];
 			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
@@ -62,7 +64,7 @@ class Main {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					Window window = new Window("Zerfall", 1280, 720);
-					window.useMouse(true);
+					window.useMouse(false);
 					window.useKeys(true);
 					window.addPanel(sheet);
 					window.setResizable(true);
@@ -79,7 +81,6 @@ class Main {
 	static class Sheet extends JPanel {
 		@Override
 		public void paintComponent(Graphics g1) {
-			if (itemsLoaded) {
 				super.paintComponent(g1);
 				Graphics2D g = (Graphics2D) g1;
 				g.setColor(Color.black);
@@ -95,17 +96,16 @@ class Main {
 				g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
 				g.drawString(player.getCurrentGun().getName(), getWidth() - 100, getHeight() - 100);
 				if (player.getSpriteNum() > 3) {
-					player.setSpriteNum(player.getSpriteNum() - 4);
-				}
+			          player.setSpriteNum(player.getSpriteNum() - 4);
+			     }
 				g.dispose();
-			}
 		}
 	}
 
 	static Map<String, Object> parseXMLElement(String path, String tagName, String IDTag, String elementID) {
 		try {
 			Map<String, Object> XMLData = new HashMap<>();
-			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path));
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path)).;
 			doc.getDocumentElement().normalize();
 			NodeList nList = doc.getElementsByTagName(tagName);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -136,7 +136,7 @@ class Main {
 					System.err.println("You didn't give the parser the right info you idiot!");
 				}
 			}
-		} catch (SAXException | IOException | ParserConfigurationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

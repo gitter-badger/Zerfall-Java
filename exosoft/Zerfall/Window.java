@@ -14,37 +14,30 @@ import javax.swing.JPanel;
 
 public class Window extends JFrame implements KeyListener, MouseListener {
 	/**
-	 * 
+	 * @implements KeyListener, MouseListener
+	 * @extends JFrame
+	 * Custom JFrame that can hold a JPanel for drawing.
 	 */
 	private static final long serialVersionUID = -8208101772064469647L;
-
-	public Window(String title, int width, int height, boolean resizable) throws HeadlessException {
-		super(title);
-		setSize(width, height);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		add(Main.sheet);
-		setVisible(true);
-		setResizable(resizable);
-	}
 
 	public Window(String title, int width, int height) throws HeadlessException {
 		super(title);
 		setSize(width, height);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		add(Main.sheet);
 		setVisible(true);
-		setResizable(false);
 	}
 
 	public Window(int width, int height) {
 		super();
 		setSize(width, height);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		add(Main.sheet);
 		setVisible(true);
-		setResizable(false);
-		addKeyListener(this);
-		addMouseListener(this);
+	}
+	
+	public Window(String title) {
+	     super(title);
+	     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	     setVisible(true);
 	}
 
 	public Window() {
@@ -75,28 +68,28 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+          // TODO: Write mouseclick logic
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+          // TODO: Write mousepress logic
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+          // TODO: Write mouserelease logic
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
+		// TODO: Write mouseenter logic
 
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
+		// TODO: Write mouseexit logic
 
 	}
 
