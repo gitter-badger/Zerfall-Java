@@ -61,10 +61,11 @@ class Main {
 			sheet = new Sheet();
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					Window window = new Window("Zerfall", 1280, 720, false);
+					Window window = new Window("Zerfall", 1280, 720);
 					window.useMouse(true);
 					window.useKeys(true);
 					window.addPanel(sheet);
+					window.setResizable(true);
 				}
 			});
 			logicTimer.start();
