@@ -12,6 +12,12 @@
 		<eti> 48 </eti>
 		<clip> 30 </clip>
 	</gun>
+	<gun name = "M1911" id = "colt">
+		<type> semi </type>
+		<rpm> 25 </rpm>
+		<eti> 49 </eti>
+		<clip> 7 </clip>
+	</gun>
 	<gun name = "Dragunov" id = "drgv">
 		<type> semi </type>
 		<rpm> 30 </rpm>
@@ -41,12 +47,6 @@
 		<rpm> 6 </rpm>
 		<eti> 145 </eti>
 		<clip> 5 </clip>
-	</gun>
-	<gun name = "M1911" id = "colt">
-		<type> semi </type>
-		<rpm> 25 </rpm>
-		<eti> 49 </eti>
-		<clip> 7 </clip>
 	</gun>
 	<gun name = "M1928" id = "thom">
 		<type> full </type>
