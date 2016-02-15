@@ -26,23 +26,22 @@ import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 class Main {
-	final static int logicRate;
-	final static int drawRate;
+	final static int logicRate = 120;
+	final static int drawRate = 60;
 	static boolean[] keys;
 	static BufferedImage map;
 	static BufferedImage foreground;
 	static BufferedImage bitmap;
 	static Sheet sheet;
 	static Avatar player;
-	static Timer drawTimer
+	static Timer drawTimer;
 	static Timer logicTimer;
-	private boolean itemsLoaded;
+	private static boolean itemsLoaded;
 
 	public static void main(String[] args) {
 		try {
 			TinySound.init();
-			logicRate = 120;
-			drawRate = 60;
+			
 			keys = new boolean[256];
 			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
@@ -105,7 +104,7 @@ class Main {
 	static Map<String, Object> parseXMLElement(String path, String tagName, String IDTag, String elementID) {
 		try {
 			Map<String, Object> XMLData = new HashMap<>();
-			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path)).;
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path));
 			doc.getDocumentElement().normalize();
 			NodeList nList = doc.getElementsByTagName(tagName);
 			for (int temp = 0; temp < nList.getLength(); temp++) {

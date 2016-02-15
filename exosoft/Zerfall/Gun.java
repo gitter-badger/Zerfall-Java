@@ -2,12 +2,11 @@ package exosoft.Zerfall;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Map;
 import javax.swing.Timer;
 import kuusisto.tinysound.*;
-
-import com.sun.glass.events.KeyEvent;
 
 public class Gun extends Main {
 	Sound gunshotSND;
@@ -22,6 +21,7 @@ public class Gun extends Main {
 	Timer fullFire, reloadMag, swapGun;
 	Timer semiFire;
 	boolean canFire = true;
+	Timer boltFire;
 
 	enum weaponType {
 		FULL, SEMI, BOLT
@@ -94,14 +94,23 @@ public class Gun extends Main {
 	}
 
 	void fire() {
-	     if (getClipRounds > 0 && !reloadMag.isRunning()) {
-	          switch (type) {
-	          case weaponType.FULL:
+		if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+			switch (type) {
+			case FULL:
 				fullFire.start();
 				break;
-		     case weaponType.SEMI:
-			     if (canFire) {
-				semiFire.start();
+			case SEMI:
+				if (canFire) {
+					semiFire.start();
+				}
+				break;
+			case BOLT:
+				if (canFire) {
+					boltFire.start();
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
