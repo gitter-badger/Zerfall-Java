@@ -50,7 +50,7 @@ class XML {
 	    Document xmlFile = db.parse(file);
 	    doc.getDocumentElement().normalize();
 	    NodeList nList = doc.getElementsByTagName(tagName);
-	    elements = new Element[nList.getLength()];
+	    nodes = new Node[nList.getLength()];
 	}
 	
 	XML(String path) {
@@ -60,11 +60,19 @@ class XML {
 	class Attribute {
 	    private String tag;
 	    private Object content;
+	    Element(String tag, Object content) {
+	        this.tag = tag;
+	        this.content = content;
+	    }
 	}
 	
 	class Element {
 	    private String label;
 	    private Object content;
+	    Element(String label, Object content) {
+	        this.label = label;
+	        this.content = content;
+	    }
 	}
 	
 	class Node {
@@ -72,6 +80,4 @@ class XML {
 	    Element[] elements;
 	    Attribute[] attributes;
 	}
-	    
-	    
 }
