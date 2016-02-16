@@ -38,14 +38,40 @@ class XML {
 		}
 		return null;
 	} */
-	Element[] elements;
+	private String label;
+	Node[] nodes;
+	private String path;
+	private File file;
+	
+	
 	XML(File file) {
-	    Document xmlFile = new DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
+	    DocumentBuilderFactory dbf = new DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document xmlFile = db.parse(file);
 	    doc.getDocumentElement().normalize();
 	    NodeList nList = doc.getElementsByTagName(tagName);
 	    elements = new Element[nList.getLength()];
 	}
+	
 	XML(String path) {
 	    this(new File(path));
 	}
+	
+	class Attribute {
+	    private String tag;
+	    private Object content;
+	}
+	
+	class Element {
+	    private String label;
+	    private Object content;
+	}
+	
+	class Node {
+	    private String label;
+	    Element[] elements;
+	    Attribute[] attributes;
+	}
+	    
+	    
 }
