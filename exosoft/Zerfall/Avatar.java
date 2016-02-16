@@ -18,6 +18,7 @@ public class Avatar extends Sprite {
 	private double yVel = 0;
 	private boolean collision[] = new boolean[5];
 	private Gun currentGun = new Gun();
+	private Timer swapGun;
 
 	public Avatar() {
 		super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
