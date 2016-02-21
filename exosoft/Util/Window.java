@@ -1,8 +1,5 @@
-package exosoft.Zerfall;
+package exosoft.Util;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,6 +16,7 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 	 * Custom JFrame that can hold a JPanel for drawing.
 	 */
 	private static final long serialVersionUID = -8208101772064469647L;
+	private boolean[] keys = new boolean[256];
 
 	public Window(String title, int width, int height) throws HeadlessException {
 		super(title);
@@ -96,21 +94,21 @@ public class Window extends JFrame implements KeyListener, MouseListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = true;
+			keys[e.getKeyCode()] = true;
 		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = true;
+			keys[e.getKeyCode()] = true;
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() < 256) {
-			Main.keys[e.getKeyCode()] = false;
+			keys[e.getKeyCode()] = false;
 		}
 	}
 }

@@ -22,13 +22,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import exosoft.Util.Window;
 import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 class Main {
 	final static int logicRate = 120;
 	final static int drawRate = 60;
-	static boolean[] keys;
 	static BufferedImage map;
 	static BufferedImage foreground;
 	static BufferedImage bitmap;
@@ -36,13 +36,11 @@ class Main {
 	static Avatar player;
 	static Timer drawTimer;
 	static Timer logicTimer;
-	private static boolean itemsLoaded;
 
 	public static void main(String[] args) {
+		addKeyListener(window);
 		try {
 			TinySound.init();
-			
-			keys = new boolean[256];
 			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
@@ -71,7 +69,6 @@ class Main {
 			});
 			logicTimer.start();
 			drawTimer.start();
-			itemsLoaded = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
