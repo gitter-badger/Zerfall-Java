@@ -5,10 +5,16 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
+
+import kuusisto.tinysound.Music;
+import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 
 public class Avatar extends Sprite {
 	Rectangle bounds = new Rectangle();
@@ -27,7 +33,7 @@ public class Avatar extends Sprite {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentGun = currentGun.swap(getCurrentGun(), gunSwitcher);
-				if (!keys[KeyEvent.VK_1]) {
+				if (!getKey(KeyEvent.VK_1)) {
 					swapGun.stop();
 				}
 			}
@@ -85,17 +91,17 @@ public class Avatar extends Sprite {
 		} else {
 			yVel += .4;
 		}
-		if (keys[KeyEvent.VK_A]) {
+		if (getKey(KeyEvent.VK_A)) {
 			if (!collision[3]) {
 				xPos -= 4;
 			}
 		}
-		if (keys[KeyEvent.VK_D]) {
+		if (getKey(KeyEvent.VK_D)) {
 			if (!collision[4]) {
 				xPos += 4;
 			}
 		}
-		if (keys[KeyEvent.VK_W]) {
+		if (getKey(KeyEvent.VK_W)) {
 			if (collision[0]) {
 				yVel = -4;
 			} else if (collision[1]) {
@@ -139,7 +145,7 @@ public class Avatar extends Sprite {
 				c = bitmap.getRGB((int) x / 10, (int) y / 10);
 				switch (c) {
 				case 0xFFFF0000:
-					if (keys[KeyEvent.VK_E]) {
+					if (getKey(KeyEvent.VK_E)) {
 						openDoor(x, y);
 					}
 				case 0xFF000000:
@@ -153,7 +159,7 @@ public class Avatar extends Sprite {
 				c = bitmap.getRGB((int) x / 10, (int) y / 10);
 				switch (c) {
 				case 0xFFFF0000:
-					if (keys[KeyEvent.VK_E]) {
+					if (getKey(KeyEvent.VK_E)) {
 						openDoor(x, y);
 					}
 				case 0xFF000000:
@@ -165,13 +171,13 @@ public class Avatar extends Sprite {
 		return collision;
      }
      synchronized void gunLogic() {
-		if (keys[KeyEvent.VK_SPACE] && !currentGun.fullFire.isRunning()) {
+		if (getKey(KeyEvent.VK_SPACE) && !currentGun.fullFire.isRunning()) {
 			currentGun.fire();
 		}
-		if (keys[KeyEvent.VK_R] && !currentGun.reloadMag.isRunning()) {
+		if (getKey(KeyEvent.VK_R) && !currentGun.reloadMag.isRunning()) {
 			currentGun.reload();
 		}
-		if (keys[KeyEvent.VK_1] && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
+		if (getKey(KeyEvent.VK_1) && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
 			swapGun.start();
 		}
 	}
@@ -180,7 +186,7 @@ public class Avatar extends Sprite {
 		if (collision[1]) {
 			setSpriteNum(getSpriteNum() - getSpriteNum() % 2);
 		}
-		if (keys[KeyEvent.VK_D]) {
+		if (getKey(KeyEvent.VK_D)) {
 			switch (getSpriteNum()) {
 			case 0:
 			case 1:
@@ -190,7 +196,7 @@ public class Avatar extends Sprite {
 				break;
 			}
 		}
-		if (keys[KeyEvent.VK_A]) {
+		if (getKey(KeyEvent.VK_A)) {
 			switch (getSpriteNum()) {
 			case 2:
 			case 3:
@@ -200,7 +206,7 @@ public class Avatar extends Sprite {
 				break;
 			}
 		}
-		if (keys[KeyEvent.VK_W] && collision[1]) {
+		if (getKey(KeyEvent.VK_W) && collision[1]) {
 			setSpriteNum(getSpriteNum() + (getSpriteNum() + 1) % 2);
 		}
 	}
@@ -274,6 +280,174 @@ public class Avatar extends Sprite {
 	class m60 extends Gun {
 		m60() {
 			super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
+		}
+	}
+	
+	enum weaponType {
+		FULL, SEMI, BOLT
+	}
+	
+	public class Gun {
+		Sound gunshotSND;
+		Music reloadSND;
+		int clipSize;
+		int clipRounds;
+		int damage;
+		double fireRate;
+		weaponType type;
+		String name;
+		int boltPosition;
+		Timer fullFire, reloadMag, swapGun;
+		Timer semiFire;
+		boolean canFire = true;
+		Timer boltFire;
+
+		Gun() {
+			gunshotSND = null;
+			reloadSND = null;
+			clipSize = 0;
+			clipRounds = 0;
+			damage = 0;
+			fireRate = 0.0;
+			name = null;
+		}
+
+		Gun(Map<String, Object> data) {
+			try {
+				clipRounds = clipSize = Integer.valueOf(data.get("clip").toString());
+				fireRate = (Integer.valueOf(data.get("rpm").toString()));
+				damage = (int) Integer.valueOf(data.get("eti").toString());
+				type = weaponType.valueOf(data.get("type").toString().toUpperCase());
+				name = data.get("name").toString();
+				reloadSND = TinySound
+						.loadMusic(new File("resources/sounds/guns/" + data.get("id").toString() + "_reload.au"));
+				gunshotSND = TinySound
+						.loadSound(new File("resources/sounds/guns/" + data.get("id").toString() + "_gunshot.au"));
+				fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (Main.player.getSpriteNum() < 4) {
+							Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
+						}
+						gunshotSND.play();
+						clipRounds--;
+						if (getKey(KeyEvent.VK_SPACE) || clipRounds < 1 || !reloadMag.isRunning()) {
+							fullFire.stop();
+						}
+					}
+				});
+				semiFire = new Timer(10, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (getKey(KeyEvent.VK_SPACE)) {
+							if (Main.player.getSpriteNum() < 4) {
+								Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
+							}
+							gunshotSND.play();
+							clipRounds--;
+							canFire = false;
+						}
+						if (!getKey(KeyEvent.VK_SPACE)) {
+							canFire = true;
+							semiFire.stop();
+						}
+					}
+				});
+				reloadMag = new Timer(100, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (reloadSND.done()) {
+							reloadSND.stop();
+							clipRounds = clipSize;
+							reloadMag.stop();
+						}
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		void fire() {
+			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+				switch (type) {
+				case FULL:
+					fullFire.start();
+					break;
+				case SEMI:
+					if (canFire) {
+						semiFire.start();
+					}
+					break;
+				case BOLT:
+					if (canFire) {
+						boltFire.start();
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		void reload() {
+			reloadSND.play(false);
+			reloadMag.start();
+		}
+
+		public int getClipSize() {
+			return clipSize;
+		}
+
+		public int getClipRounds() {
+			return clipRounds;
+		}
+
+		public int getDamage() {
+			return damage;
+		}
+
+		public int getFireRate() {
+			return (int) Math.round(fireRate);
+		}
+
+		public weaponType getType() {
+			return type;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setClipSize(int clipSize) {
+			this.clipSize = clipSize;
+		}
+
+		public void setClipRounds(int clipRounds) {
+			this.clipRounds = clipRounds;
+		}
+
+		public void setDamage(int damage) {
+			this.damage = damage;
+		}
+
+		public void setFireRate(double fireRate) {
+			this.fireRate = fireRate;
+		}
+
+		public Gun swap(Gun gun, Gun[] gunSwitcher) {
+			Class<? extends Gun> gunClass = gun.getClass();
+			if (gunSwitcher[gunSwitcher.length - 1].getClass() == gunClass) {
+				return gunSwitcher[0];
+			} else {
+				for (int i = 0; i < gunSwitcher.length - 1; i++) {
+					if (gunSwitcher[i].getClass() == gunClass) {
+						return gunSwitcher[i + 1];
+					}
+
+				}
+			}
+			return gun;
 		}
 	}
 }

@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
@@ -36,9 +38,11 @@ class Main {
 	static Avatar player;
 	static Timer drawTimer;
 	static Timer logicTimer;
+	private boolean[] keys = new boolean[512];
+	static Main m = new Main();
+	static CKeyListener cKeyListener = m.new CKeyListener();
 
 	public static void main(String[] args) {
-		addKeyListener(window);
 		try {
 			TinySound.init();
 			player = new Avatar();
@@ -61,10 +65,9 @@ class Main {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					Window window = new Window("Zerfall", 1280, 720);
-					window.useMouse(false);
-					window.useKeys(true);
 					window.addPanel(sheet);
-					window.setResizable(true);
+					window.setFocusable(true);
+					window.addKeyListener(cKeyListener);
 				}
 			});
 			logicTimer.start();
@@ -73,28 +76,28 @@ class Main {
 			e.printStackTrace();
 		}
 	}
-
+	
 	static class Sheet extends JPanel {
 		@Override
 		public void paintComponent(Graphics g1) {
-				super.paintComponent(g1);
-				Graphics2D g = (Graphics2D) g1;
-				g.setColor(Color.black);
-				g.fillRect(0, 0, getWidth(), getHeight());
-				g.translate((int) -(player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
-						(int) -(player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
-				g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
-				g.drawImage(player.sprites[player.getSpriteNum()], player.getxPos(), player.getyPos(), null);
-				g.drawImage(foreground, 0, 0, null);
-				g.setColor(Color.blue);
-				g.translate((int) (player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
-						(int) (player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
-				g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
-				g.drawString(player.getCurrentGun().getName(), getWidth() - 100, getHeight() - 100);
-				if (player.getSpriteNum() > 3) {
-			          player.setSpriteNum(player.getSpriteNum() - 4);
-			     }
-				g.dispose();
+			super.paintComponent(g1);
+			Graphics2D g = (Graphics2D) g1;
+			g.setColor(Color.black);
+			g.fillRect(0, 0, getWidth(), getHeight());
+			g.translate((int) -(player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+					(int) -(player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
+			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
+			g.drawImage(player.sprites[player.getSpriteNum()], player.getxPos(), player.getyPos(), null);
+			g.drawImage(foreground, 0, 0, null);
+			g.setColor(Color.blue);
+			g.translate((int) (player.getxPos() + player.sprites[0].getWidth() / 2 - getWidth() / 2),
+					(int) (player.getyPos() + player.sprites[0].getHeight() / 2 - getHeight() / 2));
+			g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
+			g.drawString(player.getCurrentGun().getName(), getWidth() - 100, getHeight() - 100);
+			if (player.getSpriteNum() > 3) {
+				player.setSpriteNum(player.getSpriteNum() - 4);
+			}
+			g.dispose();
 		}
 	}
 
@@ -136,5 +139,36 @@ class Main {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	class CKeyListener implements KeyListener {
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			setKey(e.getKeyCode(), true);
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			setKey(e.getKeyCode(), true);
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			setKey(e.getKeyCode(), false);
+		}		
+	}
+	public boolean getKey(int index) {
+		try {
+			return keys[index];
+		} catch (NullPointerException e) {
+			System.err.println("Attempted to access nonexistent key");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public void setKey(int index, boolean status) {
+	    keys[index] = status;
 	}
 }
