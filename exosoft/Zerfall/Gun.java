@@ -1,14 +1,12 @@
 package exosoft.Zerfall;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Map;
 import javax.swing.Timer;
 import kuusisto.tinysound.*;
-
-import com.sun.glass.events.KeyEvent;
 
 public class Gun extends Main {
 	Sound gunshotSND;
@@ -20,8 +18,10 @@ public class Gun extends Main {
 	weaponType type;
 	String name;
 	int boltPosition;
-	Timer fullFire, reloadMag;
+	Timer fullFire, reloadMag, swapGun;
 	Timer semiFire;
+	boolean canFire = true;
+	Timer boltFire;
 
 	enum weaponType {
 		FULL, SEMI, BOLT
@@ -51,8 +51,8 @@ public class Gun extends Main {
 			fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (Main.player.spriteNum < 4) {
-						Main.player.spriteNum += 4;
+					if (Main.player.getSpriteNum() < 4) {
+						Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
 					}
 					gunshotSND.play();
 					clipRounds--;
@@ -61,17 +61,23 @@ public class Gun extends Main {
 					}
 				}
 			});
-			semiFire = new Timer(0, new ActionListener() {
+			semiFire = new Timer(10, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (Main.player.spriteNum < 4) {
-						Main.player.spriteNum += 4;
+					if (keys[KeyEvent.VK_SPACE]) {
+						if (Main.player.getSpriteNum() < 4) {
+							Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
+						}
+						gunshotSND.play();
+						clipRounds--;
+						canFire = false;
 					}
-					gunshotSND.play();
-					clipRounds--;
+					if (!keys[KeyEvent.VK_SPACE]) {
+						canFire = true;
+						semiFire.stop();
+					}
 				}
 			});
-			semiFire.setRepeats(false);
 			reloadMag = new Timer(100, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -88,13 +94,23 @@ public class Gun extends Main {
 	}
 
 	void fire() {
-		if (type == weaponType.FULL) {
-			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+		if (getClipRounds() > 0 && !reloadMag.isRunning()) {
+			switch (type) {
+			case FULL:
 				fullFire.start();
-			}
-		} else if (type == weaponType.SEMI) {
-			if (getClipRounds() > 0 && !reloadMag.isRunning()) {
-				semiFire.start();
+				break;
+			case SEMI:
+				if (canFire) {
+					semiFire.start();
+				}
+				break;
+			case BOLT:
+				if (canFire) {
+					boltFire.start();
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -144,4 +160,18 @@ public class Gun extends Main {
 		this.fireRate = fireRate;
 	}
 
+	public Gun swap(Gun gun, Gun[] gunSwitcher) {
+		Class<? extends Gun> gunClass = gun.getClass();
+		if (gunSwitcher[gunSwitcher.length - 1].getClass() == gunClass) {
+			return gunSwitcher[0];
+		} else {
+			for (int i = 0; i < gunSwitcher.length - 1; i++) {
+				if (gunSwitcher[i].getClass() == gunClass) {
+					return gunSwitcher[i + 1];
+				}
+
+			}
+		}
+		return gun;
+	}
 }
