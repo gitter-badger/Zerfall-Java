@@ -1,4 +1,4 @@
-package exosoft.Zerfall;
+package exosoft.Util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,12 +6,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public abstract class Sprite extends Main {
+public abstract class Sprite {
 	BufferedImage spriteSheet = null;
-	BufferedImage[] sprites;
-	int spriteWidth = 0;
-	int spriteHeight = 0;
-	int spriteNum;
+	private BufferedImage[] sprites;
+	public int spriteWidth = 0;
+	public int spriteHeight = 0;
+	public int spriteNum;
 	
 	public enum SheetType {
 		SINGLE,
@@ -44,4 +44,9 @@ public abstract class Sprite extends Main {
 			break;
 		}
 	}
+	
+	public BufferedImage getSprite(int index) {
+		return sprites[index];
+	}
+	
 }
