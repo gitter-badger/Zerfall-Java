@@ -32,6 +32,8 @@ import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 
+import exosoft.Util.Phys2D;
+
 @SuppressWarnings("serial")
 public class Main extends Window {
 	final static int logicRate = 120;
@@ -44,6 +46,7 @@ public class Main extends Window {
 	static Timer drawTimer;
 	static Timer logicTimer;
 	private static boolean[] keys = new boolean[512];
+	static Rectangle[] mesh;
 
 	public static void main(String[] args) {
 		try {
@@ -51,6 +54,7 @@ public class Main extends Window {
 			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
+			mesh = Phys2D.createMesh(bitmap);
 			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
 			drawTimer = new Timer(1000 / drawRate, new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -168,10 +172,11 @@ public class Main extends Window {
 	public static void setKey(int index, boolean status) {
 		keys[index] = status;
 	}
-	
+
 	public static class Avatar extends Sprite {
-		Rectangle bounds = new Rectangle();
-		private Gun[] gunSwitcher = { new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3(), new colt(), new m60() };
+		Rectangle bounds;
+		private Gun[] gunSwitcher = { new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3(), new colt(),
+				new m60() };
 		private double xPos = 4500;
 		private double yPos = 1240;
 		private double yVel = 0;
@@ -181,6 +186,7 @@ public class Main extends Window {
 
 		public Avatar() {
 			super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
+			bounds = new Rectangle(4500, 1240, 175, 161);
 			currentGun = new colt();
 			swapGun = new Timer(250, new ActionListener() {
 				@Override
@@ -239,6 +245,9 @@ public class Main extends Window {
 
 		synchronized void logic() {
 			collision = collision();
+			if (meshClip() == true) {
+				System.out.println("Collision detected.");
+			}
 			if (collision[1]) {
 				yVel = 0;
 			} else {
@@ -265,11 +274,14 @@ public class Main extends Window {
 				yVel = Math.abs(yVel);
 			}
 			yPos += yVel;
+			bounds.setLocation((int) Math.round(xPos), (int) Math.round(yPos));
 		}
-	     boolean[] collision() {
-	          int c;
-	          boolean[] collision = new boolean[5];
-	          lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
+
+		@Deprecated
+		boolean[] collision() {
+			int c;
+			boolean[] collision = new boolean[5];
+			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
 				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 10) {
 					c = bitmap.getRGB((int) x / 10, (int) y / 10);
 					switch (c) {
@@ -322,8 +334,18 @@ public class Main extends Window {
 				}
 			}
 			return collision;
-	     }
-	     synchronized void gunLogic() {
+		}
+
+		boolean meshClip() {
+			for (Rectangle rect : mesh) {
+				if (bounds.intersects(rect)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		synchronized void gunLogic() {
 			if (getKey(KeyEvent.VK_SPACE) && !currentGun.fullFire.isRunning()) {
 				currentGun.fire();
 			}
@@ -429,17 +451,17 @@ public class Main extends Window {
 				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "hkg3"));
 			}
 		}
-		
+
 		class m60 extends Gun {
 			m60() {
 				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
 			}
 		}
-		
+
 		enum weaponType {
 			FULL, SEMI, BOLT
 		}
-		
+
 		public class Gun {
 			Sound gunshotSND;
 			Music reloadSND;
