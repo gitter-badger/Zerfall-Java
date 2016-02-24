@@ -31,7 +31,7 @@ import exosoft.Util.Window;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-
+import exosoft.Util.ObjPhys;
 import exosoft.Util.Phys2D;
 
 @SuppressWarnings("serial")
@@ -47,6 +47,7 @@ public class Main extends Window {
 	static Timer logicTimer;
 	private static boolean[] keys = new boolean[512];
 	static Rectangle[] mesh;
+	static Phys2D physics = new Phys2D();
 
 	public static void main(String[] args) {
 		try {
@@ -54,7 +55,7 @@ public class Main extends Window {
 			player = new Avatar();
 			map = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
-			mesh = Phys2D.createMesh(bitmap);
+			mesh = physics.createGrid(bitmap);
 			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
 			drawTimer = new Timer(1000 / drawRate, new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -173,7 +174,7 @@ public class Main extends Window {
 		keys[index] = status;
 	}
 
-	public static class Avatar extends Sprite {
+	public static class Avatar extends Sprite implements ObjPhys {
 		Rectangle bounds;
 		private Gun[] gunSwitcher = { new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3(), new colt(),
 				new m60() };
@@ -624,6 +625,12 @@ public class Main extends Window {
 				}
 				return gun;
 			}
+		}
+
+		@Override
+		public void collisionLogic() {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 
