@@ -458,6 +458,12 @@ public class Main extends Window {
 				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
 			}
 		}
+		
+		class m9 extends Gun {
+		     m9() {
+		           super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m9");
+		     }
+		}
 
 		enum weaponType {
 			FULL, SEMI, BOLT
@@ -466,17 +472,12 @@ public class Main extends Window {
 		public class Gun {
 			Sound gunshotSND;
 			Music reloadSND;
-			int clipSize;
-			int clipRounds;
-			int damage;
+			int clipSize, clipRounds, damage;
 			double fireRate;
 			weaponType type;
 			String name;
-			int boltPosition;
-			Timer fullFire, reloadMag, swapGun;
-			Timer semiFire;
+			Timer fullFire, reloadMag, swapGun, semiFire, boltFire;
 			boolean canFire = true;
-			Timer boltFire;
 
 			Gun() {
 				gunshotSND = null;
@@ -502,9 +503,6 @@ public class Main extends Window {
 					fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							if (Main.player.getSpriteNum() < 4) {
-								Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
-							}
 							gunshotSND.play();
 							clipRounds--;
 							if (getKey(KeyEvent.VK_SPACE) || clipRounds < 1 || !reloadMag.isRunning()) {
@@ -516,16 +514,12 @@ public class Main extends Window {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							if (getKey(KeyEvent.VK_SPACE)) {
-								if (Main.player.getSpriteNum() < 4) {
-									Main.player.setSpriteNum(Main.player.getSpriteNum() + 4);
-								}
 								gunshotSND.play();
 								clipRounds--;
 								canFire = false;
-							}
-							if (!getKey(KeyEvent.VK_SPACE)) {
-								canFire = true;
-								semiFire.stop();
+							} else if (canFire == false) {
+							     canFire = true;
+							     semiFire.stop();
 							}
 						}
 					});
@@ -544,7 +538,7 @@ public class Main extends Window {
 				}
 			}
 
-			void fire() {
+			public void fire() {
 				if (getClipRounds() > 0 && !reloadMag.isRunning()) {
 					switch (type) {
 					case FULL:
@@ -566,7 +560,7 @@ public class Main extends Window {
 				}
 			}
 
-			void reload() {
+			public void reload() {
 				reloadSND.play(false);
 				reloadMag.start();
 			}
@@ -630,7 +624,6 @@ public class Main extends Window {
 		@Override
 		public void collisionLogic() {
 			// TODO Auto-generated method stub
-			
 		}
 	}
 
