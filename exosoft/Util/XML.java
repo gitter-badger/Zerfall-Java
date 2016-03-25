@@ -1,4 +1,4 @@
-package exosoft.Util;
+package exosoft.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,15 +58,7 @@ class XML {
 	    NodeList nList = xmlFile.getElementsByTagName("");
 	    nodes = new Node[nList.getLength()];
 	    for (int i = 0; i < nList.getLength(); i++) {
-	    	  nodes[i] = new Node();
-	    	  NamedNodeMap attributes = nList.getAttributes();
-	    	  NodeList elements = nList.getElementsByTagName("");
-	    	  for (int j = 0; j < attributes.getLength(); j++) {
-	    	      nodes[i].addAttribute(new Attribute(attributes.item(j).getNodeName(), attributes.item(j).getTextContent()));
-	    	  }
-	    	  for (int j = 0; j < elements.getLength(); j++) {
-	    	      nodes[i].addElement(new Element(elements.item(j).getNodeName(), attributes.item(j).getTextContent()));
-	    	  }
+	    	nodes[i] = new Node();
 	    }
 	}
 
@@ -154,7 +146,7 @@ class XML {
 		private String label;
 		List<Element> elements;
 		List<Attribute> attributes;
-           
+
 		void addAttribute(Attribute a) {
 			attributes.add(a);
 		}

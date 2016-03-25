@@ -1,4 +1,4 @@
-package exosoft.Zerfall;
+package exosoft.zerfall;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -26,13 +26,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import exosoft.Util.Sprite;
-import exosoft.Util.Window;
+import exosoft.iso.Sprite;
+import exosoft.util.ObjPhys;
+import exosoft.util.Phys2D;
+import exosoft.util.Window;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
-import exosoft.Util.ObjPhys;
-import exosoft.Util.Phys2D;
 
 @SuppressWarnings("serial")
 public class Main extends Window {
@@ -279,7 +279,7 @@ public class Main extends Window {
 		}
 
 		@Deprecated
-		boolean[] collision() {
+		public boolean[] collision() {
 			int c;
 			boolean[] collision = new boolean[5];
 			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
@@ -458,11 +458,11 @@ public class Main extends Window {
 				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
 			}
 		}
-		
+
 		class m9 extends Gun {
-		     m9() {
-		           super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m9");
-		     }
+			m9() {
+				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m9"));
+			}
 		}
 
 		enum weaponType {
@@ -518,8 +518,8 @@ public class Main extends Window {
 								clipRounds--;
 								canFire = false;
 							} else if (canFire == false) {
-							     canFire = true;
-							     semiFire.stop();
+								canFire = true;
+								semiFire.stop();
 							}
 						}
 					});

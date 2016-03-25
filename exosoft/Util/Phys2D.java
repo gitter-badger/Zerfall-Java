@@ -1,4 +1,4 @@
-package exosoft.Util;
+package exosoft.util;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
