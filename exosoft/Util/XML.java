@@ -1,4 +1,4 @@
-package exosoft.Util;
+package exosoft.util;
 
 import java.io.File;
 import java.io.IOException;
