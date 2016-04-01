@@ -26,19 +26,19 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import exosoft.iso.Phys2D;
+import exosoft.iso.Avatar;
+import exosoft.iso.Environment;
+import exosoft.iso.ObjectPhysics;
 import exosoft.iso.Sprite;
-import exosoft.util.ObjPhys;
+import exosoft.iso.Sprite.SheetType;
 import exosoft.util.Window;
-import kuusisto.tinysound.Music;
-import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
-public class Main extends Window {
+public class Main {
 	final static int logicRate = 120;
 	final static int drawRate = 60;
-	static BufferedImage map;
+	static BufferedImage background;
 	static BufferedImage foreground;
 	static BufferedImage bitmap;
 	static Sheet sheet;
@@ -46,26 +46,25 @@ public class Main extends Window {
 	static Timer drawTimer;
 	static Timer logicTimer;
 	private static boolean[] keys = new boolean[512];
-	static Rectangle[] mesh;
-	static Phys2D physics = new Phys2D();
+	static Environment map = new Environment();
 
 	public static void main(String[] args) {
 		try {
 			TinySound.init();
-			player = new Avatar();
-			map = ImageIO.read(new File("resources/maps/background.png"));
+			player = new Avatar(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
+			background = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
-			mesh = physics.createGrid(bitmap);
 			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
 			drawTimer = new Timer(1000 / drawRate, new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
-					player.visualLogic();
+					player.visual();
 					sheet.repaint();
 				}
 			});
 			logicTimer = new Timer(1000 / logicRate, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					player.logic();
+					player.collision();
+					player.physics();
 				}
 			});
 			sheet = new Sheet();
@@ -106,16 +105,11 @@ public class Main extends Window {
 		public void paintComponent(Graphics g1) {
 			super.paintComponent(g1);
 			Graphics2D g = (Graphics2D) g1;
-			g.setColor(Color.black);
+			g.setColor(Color.white);
 			g.fillRect(0, 0, getWidth(), getHeight());
-			g.translate((int) -(player.getxPos() + player.getSprite(0).getWidth() / 2 - getWidth() / 2),
-					(int) -(player.getyPos() + player.getSprite(0).getHeight() / 2 - getHeight() / 2));
-			g.drawImage(map, 0, 0, map.getWidth(), map.getHeight(), null);
-			g.drawImage(player.getSprite(player.getSpriteNum()), player.getxPos(), player.getyPos(), null);
-			g.drawImage(foreground, 0, 0, null);
-			g.setColor(Color.blue);
-			g.translate((int) (player.getxPos() + player.getSprite(0).getWidth() / 2 - getWidth() / 2),
-					(int) (player.getyPos() + player.getSprite(0).getHeight() / 2 - getHeight() / 2));
+			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntxPosition(), player.getIntyPosition(), null);
+			g.translate((int) (player.getIntxPosition() + player.getSprite(0).getWidth() / 2 - getWidth() / 2),
+					(int) (player.getIntyPosition() + player.getSprite(0).getHeight() / 2 - getHeight() / 2));
 			if (player.getSpriteNum() > 3) {
 				player.setSpriteNum(player.getSpriteNum() - 4);
 			}
@@ -170,162 +164,6 @@ public class Main extends Window {
 
 	public static void setKey(int index, boolean status) {
 		keys[index] = status;
-	}
-
-	public static class Avatar extends Sprite implements ObjPhys {
-		Rectangle bounds;
-		private double xPos = 4500;
-		private double yPos = 1240;
-		private double yVel = 0;
-		private boolean collision[] = new boolean[5];
-
-		public Avatar() {
-			super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
-			bounds = new Rectangle(getxPos(), getyPos(), 175, 161);
-		}
-
-		public int getxPos() {
-			return (int) Math.round(xPos);
-		}
-
-		public void setxPos(double xPos) {
-			if (xPos > 0 && xPos < map.getWidth()) {
-				this.xPos = xPos;
-			} else if (xPos < 0) {
-				this.xPos = 0;
-			} else if (xPos > map.getWidth() - 1) {
-				this.xPos = map.getWidth() - 1;
-			}
-		}
-
-		public int getyPos() {
-			return (int) Math.round(yPos);
-		}
-
-		public void setyPos(double yPos) {
-			if (yPos > -1 && yPos < map.getHeight()) {
-				this.yPos = yPos;
-			} else if (yPos < 0) {
-				this.yPos = 0;
-			} else if (yPos > map.getHeight() - 1) {
-				this.yPos = map.getHeight() - 1;
-			}
-		}
-
-		public int getSpriteNum() {
-			return spriteNum;
-		}
-
-		public void setSpriteNum(int spriteNum) {
-			this.spriteNum = spriteNum;
-		}
-
-		synchronized void logic() {
-			collision = collision();
-			if (meshClip() == true) {
-				System.out.println("Collision detected.");
-			}
-			if (collision[1]) {
-				yVel = 0;
-			} else {
-				yVel += .4;
-			}
-			if (getKey(KeyEvent.VK_A)) {
-				if (!collision[3]) {
-					xPos -= 4;
-				}
-			}
-			if (getKey(KeyEvent.VK_D)) {
-				if (!collision[4]) {
-					xPos += 4;
-				}
-			}
-			if (getKey(KeyEvent.VK_W)) {
-				if (collision[0]) {
-					yVel = -4;
-				} else if (collision[1]) {
-					yVel -= 12;
-				}
-			}
-			if (collision[2]) {
-				yVel = Math.abs(yVel);
-			}
-			yPos += yVel;
-			bounds.setLocation((int) Math.round(xPos), (int) Math.round(yPos));
-		}
-
-		boolean meshClip() {
-			for (Rectangle rect : mesh) {
-				if (bounds.intersects(rect)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		synchronized void visualLogic() {
-			if (collision[1]) {
-				setSpriteNum(getSpriteNum() - getSpriteNum() % 2);
-			}
-			if (getKey(KeyEvent.VK_D)) {
-				switch (getSpriteNum()) {
-				case 0:
-				case 1:
-				case 4:
-				case 5:
-					setSpriteNum(getSpriteNum() + 2);
-					break;
-				}
-			}
-			if (getKey(KeyEvent.VK_A)) {
-				switch (getSpriteNum()) {
-				case 2:
-				case 3:
-				case 6:
-				case 7:
-					setSpriteNum(getSpriteNum() - 2);
-					break;
-				}
-			}
-			if (getKey(KeyEvent.VK_W) && collision[1]) {
-				setSpriteNum(getSpriteNum() + (getSpriteNum() + 1) % 2);
-			}
-		}
-
-		synchronized void openDoor(int x, int y) {
-			x /= 10;
-			y /= 10;
-			int h = 0;
-			boolean bool[] = new boolean[4];
-			int doorColor = 0xFFFF0000;
-			while (!(bool[1] && bool[3])) {
-				if (!(bool[1] = (bitmap.getRGB(x, y - 1) != doorColor))) {
-					y--;
-				}
-				if (!(bool[3] = (bitmap.getRGB(x, y + h) != doorColor))) {
-					h++;
-				}
-			}
-			Graphics2D foregroundGraphics = (Graphics2D) foreground.getGraphics();
-			Graphics2D bitmapGraphics = (Graphics2D) bitmap.getGraphics();
-			bitmapGraphics.setColor(Color.white);
-			bitmapGraphics.fillRect(x, y, 1, h);
-			bitmapGraphics.dispose();
-			foregroundGraphics.setComposite(AlphaComposite.Clear);
-			foregroundGraphics.fillRect(x * 10, y * 10, 11, h * 10 + 1);
-			foregroundGraphics.dispose();
-		}
-
-		@Override
-		public void collisionLogic() {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public boolean[] collision() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 }
