@@ -1,11 +1,9 @@
 package exosoft.zerfall;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -28,8 +26,6 @@ import org.w3c.dom.NodeList;
 
 import exosoft.iso.Avatar;
 import exosoft.iso.Environment;
-import exosoft.iso.ObjectPhysics;
-import exosoft.iso.Sprite;
 import exosoft.iso.Sprite.SheetType;
 import exosoft.util.Window;
 import kuusisto.tinysound.TinySound;
@@ -52,6 +48,9 @@ public class Main {
 		try {
 			TinySound.init();
 			player = new Avatar(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
+			player.setxPosition(0);
+			player.setyPosition(0);
+			player.setyVelocity(0);
 			background = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
 			foreground = ImageIO.read(new File("resources/maps/foreground.png"));
@@ -108,8 +107,6 @@ public class Main {
 			g.setColor(Color.white);
 			g.fillRect(0, 0, getWidth(), getHeight());
 			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntxPosition(), player.getIntyPosition(), null);
-			g.translate((int) (player.getIntxPosition() + player.getSprite(0).getWidth() / 2 - getWidth() / 2),
-					(int) (player.getIntyPosition() + player.getSprite(0).getHeight() / 2 - getHeight() / 2));
 			if (player.getSpriteNum() > 3) {
 				player.setSpriteNum(player.getSpriteNum() - 4);
 			}
