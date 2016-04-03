@@ -70,7 +70,7 @@ public class Main {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					Window window = new Window("Zerfall", 1280, 720);
-					window.addPanel(sheet);
+					window.add(sheet);
 					window.setFocusable(true);
 					window.addKeyListener(new KeyListener() {
 
