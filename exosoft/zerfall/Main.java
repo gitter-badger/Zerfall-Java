@@ -26,9 +26,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import exosoft.iso.Phys2D;
 import exosoft.iso.Sprite;
 import exosoft.util.ObjPhys;
-import exosoft.util.Phys2D;
 import exosoft.util.Window;
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
@@ -66,7 +66,6 @@ public class Main extends Window {
 			logicTimer = new Timer(1000 / logicRate, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					player.logic();
-					player.gunLogic();
 				}
 			});
 			sheet = new Sheet();
@@ -117,8 +116,6 @@ public class Main extends Window {
 			g.setColor(Color.blue);
 			g.translate((int) (player.getxPos() + player.getSprite(0).getWidth() / 2 - getWidth() / 2),
 					(int) (player.getyPos() + player.getSprite(0).getHeight() / 2 - getHeight() / 2));
-			g.drawString(((Integer) player.getCurrentGun().getClipRounds()).toString(), 25, 25);
-			g.drawString(player.getCurrentGun().getName(), getWidth() - 100, getHeight() - 100);
 			if (player.getSpriteNum() > 3) {
 				player.setSpriteNum(player.getSpriteNum() - 4);
 			}
@@ -126,6 +123,7 @@ public class Main extends Window {
 		}
 	}
 
+	@Deprecated
 	static Map<String, Object> parseXMLElement(String path, String tagName, String IDTag, String elementID) {
 		try {
 			Map<String, Object> XMLData = new HashMap<>();
@@ -176,28 +174,14 @@ public class Main extends Window {
 
 	public static class Avatar extends Sprite implements ObjPhys {
 		Rectangle bounds;
-		private Gun[] gunSwitcher = { new akfs(), new aug(), new drgv(), new fal(), new fms(), new hkg3(), new colt(),
-				new m60() };
 		private double xPos = 4500;
 		private double yPos = 1240;
 		private double yVel = 0;
 		private boolean collision[] = new boolean[5];
-		private Gun currentGun = new Gun();
-		private Timer swapGun;
 
 		public Avatar() {
 			super(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
-			bounds = new Rectangle(4500, 1240, 175, 161);
-			currentGun = new colt();
-			swapGun = new Timer(250, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					currentGun = currentGun.swap(getCurrentGun(), gunSwitcher);
-					if (!getKey(KeyEvent.VK_1)) {
-						swapGun.stop();
-					}
-				}
-			});
+			bounds = new Rectangle(getxPos(), getyPos(), 175, 161);
 		}
 
 		public int getxPos() {
@@ -226,14 +210,6 @@ public class Main extends Window {
 			} else if (yPos > map.getHeight() - 1) {
 				this.yPos = map.getHeight() - 1;
 			}
-		}
-
-		public Gun getCurrentGun() {
-			return currentGun;
-		}
-
-		public void setCurrentGun(Gun currentGun) {
-			this.currentGun = currentGun;
 		}
 
 		public int getSpriteNum() {
@@ -278,65 +254,6 @@ public class Main extends Window {
 			bounds.setLocation((int) Math.round(xPos), (int) Math.round(yPos));
 		}
 
-		@Deprecated
-		public boolean[] collision() {
-			int c;
-			boolean[] collision = new boolean[5];
-			lowerLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
-				for (int y = (int) (yPos + 161); y <= yPos + 162 + Math.abs(yVel); y += 10) {
-					c = bitmap.getRGB((int) x / 10, (int) y / 10);
-					switch (c) {
-					case 0xFF000000:
-						collision[1] = true;
-						yPos = Math.round((y - 161) / 10) * 10;
-						break lowerLoop;
-					case 0xFF0000FF:
-						collision[0] = true;
-						break lowerLoop;
-					}
-				}
-			}
-			upperLoop: for (int x = (int) (xPos + 25); x <= xPos + 150; x += 10) {
-				for (int y = (int) yPos; y >= yPos - 1 - Math.abs(yVel); y -= 10) {
-					c = bitmap.getRGB((int) x / 10, (int) y / 10);
-					switch (c) {
-					case 0xFF000000:
-						collision[2] = true;
-						break upperLoop;
-					}
-				}
-			}
-			leftLoop: for (int x = (int) (xPos + 20); x <= xPos + 25; x += 10) {
-				for (int y = (int) yPos; y <= yPos + 150; y += 10) {
-					c = bitmap.getRGB((int) x / 10, (int) y / 10);
-					switch (c) {
-					case 0xFFFF0000:
-						if (getKey(KeyEvent.VK_E)) {
-							openDoor(x, y);
-						}
-					case 0xFF000000:
-						collision[3] = true;
-						break leftLoop;
-					}
-				}
-			}
-			rightLoop: for (int x = (int) (xPos + 150); x <= xPos + 155; x += 10) {
-				for (int y = (int) yPos; y <= yPos + 150; y += 10) {
-					c = bitmap.getRGB((int) x / 10, (int) y / 10);
-					switch (c) {
-					case 0xFFFF0000:
-						if (getKey(KeyEvent.VK_E)) {
-							openDoor(x, y);
-						}
-					case 0xFF000000:
-						collision[4] = true;
-						break rightLoop;
-					}
-				}
-			}
-			return collision;
-		}
-
 		boolean meshClip() {
 			for (Rectangle rect : mesh) {
 				if (bounds.intersects(rect)) {
@@ -344,18 +261,6 @@ public class Main extends Window {
 				}
 			}
 			return false;
-		}
-
-		synchronized void gunLogic() {
-			if (getKey(KeyEvent.VK_SPACE) && !currentGun.fullFire.isRunning()) {
-				currentGun.fire();
-			}
-			if (getKey(KeyEvent.VK_R) && !currentGun.reloadMag.isRunning()) {
-				currentGun.reload();
-			}
-			if (getKey(KeyEvent.VK_1) && !currentGun.reloadMag.isRunning() && !swapGun.isRunning()) {
-				swapGun.start();
-			}
 		}
 
 		synchronized void visualLogic() {
@@ -411,219 +316,15 @@ public class Main extends Window {
 			foregroundGraphics.dispose();
 		}
 
-		class akfs extends Gun {
-			akfs() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "akfs"));
-			}
-		}
-
-		class aug extends Gun {
-			aug() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "aug"));
-			}
-		}
-
-		class colt extends Gun {
-			colt() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "colt"));
-			}
-		}
-
-		class drgv extends Gun {
-			drgv() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "drgv"));
-			}
-		}
-
-		class fal extends Gun {
-			fal() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fal"));
-			}
-		}
-
-		class fms extends Gun {
-			fms() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "fms"));
-			}
-		}
-
-		class hkg3 extends Gun {
-			hkg3() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "hkg3"));
-			}
-		}
-
-		class m60 extends Gun {
-			m60() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m60"));
-			}
-		}
-
-		class m9 extends Gun {
-			m9() {
-				super(parseXMLElement("resources/data/gun_data.xml", "gun", "id", "m9"));
-			}
-		}
-
-		enum weaponType {
-			FULL, SEMI, BOLT
-		}
-
-		public class Gun {
-			Sound gunshotSND;
-			Music reloadSND;
-			int clipSize, clipRounds, damage;
-			double fireRate;
-			weaponType type;
-			String name;
-			Timer fullFire, reloadMag, swapGun, semiFire, boltFire;
-			boolean canFire = true;
-
-			Gun() {
-				gunshotSND = null;
-				reloadSND = null;
-				clipSize = 0;
-				clipRounds = 0;
-				damage = 0;
-				fireRate = 0.0;
-				name = null;
-			}
-
-			Gun(Map<String, Object> data) {
-				try {
-					clipRounds = clipSize = Integer.valueOf(data.get("clip").toString());
-					fireRate = (Integer.valueOf(data.get("rpm").toString()));
-					damage = (int) Integer.valueOf(data.get("eti").toString());
-					type = weaponType.valueOf(data.get("type").toString().toUpperCase());
-					name = data.get("name").toString();
-					reloadSND = TinySound
-							.loadMusic(new File("resources/sounds/guns/" + data.get("id").toString() + "_reload.au"));
-					gunshotSND = TinySound
-							.loadSound(new File("resources/sounds/guns/" + data.get("id").toString() + "_gunshot.au"));
-					fullFire = new Timer((int) ((60 * 1000) / fireRate), new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							gunshotSND.play();
-							clipRounds--;
-							if (getKey(KeyEvent.VK_SPACE) || clipRounds < 1 || !reloadMag.isRunning()) {
-								fullFire.stop();
-							}
-						}
-					});
-					semiFire = new Timer(10, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (getKey(KeyEvent.VK_SPACE)) {
-								gunshotSND.play();
-								clipRounds--;
-								canFire = false;
-							} else if (canFire == false) {
-								canFire = true;
-								semiFire.stop();
-							}
-						}
-					});
-					reloadMag = new Timer(100, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (reloadSND.done()) {
-								reloadSND.stop();
-								clipRounds = clipSize;
-								reloadMag.stop();
-							}
-						}
-					});
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			public void fire() {
-				if (getClipRounds() > 0 && !reloadMag.isRunning()) {
-					switch (type) {
-					case FULL:
-						fullFire.start();
-						break;
-					case SEMI:
-						if (canFire) {
-							semiFire.start();
-						}
-						break;
-					case BOLT:
-						if (canFire) {
-							boltFire.start();
-						}
-						break;
-					default:
-						break;
-					}
-				}
-			}
-
-			public void reload() {
-				reloadSND.play(false);
-				reloadMag.start();
-			}
-
-			public int getClipSize() {
-				return clipSize;
-			}
-
-			public int getClipRounds() {
-				return clipRounds;
-			}
-
-			public int getDamage() {
-				return damage;
-			}
-
-			public int getFireRate() {
-				return (int) Math.round(fireRate);
-			}
-
-			public weaponType getType() {
-				return type;
-			}
-
-			public String getName() {
-				return name;
-			}
-
-			public void setClipSize(int clipSize) {
-				this.clipSize = clipSize;
-			}
-
-			public void setClipRounds(int clipRounds) {
-				this.clipRounds = clipRounds;
-			}
-
-			public void setDamage(int damage) {
-				this.damage = damage;
-			}
-
-			public void setFireRate(double fireRate) {
-				this.fireRate = fireRate;
-			}
-
-			public Gun swap(Gun gun, Gun[] gunSwitcher) {
-				Class<? extends Gun> gunClass = gun.getClass();
-				if (gunSwitcher[gunSwitcher.length - 1].getClass() == gunClass) {
-					return gunSwitcher[0];
-				} else {
-					for (int i = 0; i < gunSwitcher.length - 1; i++) {
-						if (gunSwitcher[i].getClass() == gunClass) {
-							return gunSwitcher[i + 1];
-						}
-
-					}
-				}
-				return gun;
-			}
-		}
-
 		@Override
 		public void collisionLogic() {
 			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public boolean[] collision() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
