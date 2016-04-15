@@ -9,3 +9,5 @@ Now to be clear, Exoplanet Software is not affiliated with Activision, nor Treya
 
 This game implements the following libraries:
 - the TinySound system by Finn Kuusisto
+- the Util framework by Exosoft
+- the Iso Engine by Exosoft
