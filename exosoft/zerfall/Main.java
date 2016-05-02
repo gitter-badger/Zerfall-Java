@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import exosoft.iso.Avatar;
+import exosoft.iso.Controllable;
 import exosoft.iso.Environment;
 import exosoft.iso.Sprite.SheetType;
 import exosoft.util.Window;
@@ -32,20 +33,22 @@ public class Main {
 	static BufferedImage foreground;
 	static BufferedImage bitmap;
 	static Sheet sheet;
-	static Avatar player;
+	static Character player;
 	static volatile Timer drawTimer;
 	static volatile Timer logicTimer;
 	private static boolean[] keys = new boolean[512];
-	static Environment map = new Environment();
+	static Environment map;
 
 	public static void main(String[] args) {
 		TinySound.init();
-		player = new Avatar(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
-		player.setxPosition(0);
-		player.setyPosition(0);
-		player.setyVelocity(0);
+		player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161);
+		player.setX(0);
+		player.setY(0);
+		player.setVelocity(0);
+		map = new Environment();
 		player.spawn(map);
 		map.addShape(new Rectangle(0, 600, 1920, 700));
+		sheet = new Sheet();
 		try {
 			background = ImageIO.read(new File("resources/maps/background.png"));
 			bitmap = ImageIO.read(new File("resources/maps/bitmap.png"));
@@ -63,11 +66,11 @@ public class Main {
 		});
 		logicTimer = new Timer(1000 / logicRate, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				player.collision();
+				player.movement();
 				player.physics();
+				player.collision();
 			}
 		});
-		sheet = new Sheet();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				Window window = new Window("Zerfall", 1280, 720);
@@ -104,18 +107,57 @@ public class Main {
 			Graphics2D g = (Graphics2D) g1;
 			g.setColor(Color.white);
 			g.fillRect(0, 0, getWidth(), getHeight());
-			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntxPosition(), player.getIntyPosition(),
+			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntX(), player.getIntY(),
 					null);
 			g.setColor(Color.red);
-			g.draw(player.getBounds());
+			g.draw(player.getBounds2D());
 			g.setColor(Color.blue);
 			for (Shape object : map.getObjects()) {
 				g.draw(object);
 			}
-			if (player.getSpriteNum() > 3) {
-				player.setSpriteNum(player.getSpriteNum() - 4);
-			}
 			g.dispose();
+		}
+	}
+	
+	static class Character extends Avatar implements Controllable {
+
+		public Character(SheetType type, String sheetPath, int spriteWidth, int spriteHeight) {
+			super(type, sheetPath, spriteWidth, spriteHeight);
+		}
+		public void movement() {
+			if (getKey(KeyEvent.VK_W)) {
+				moveUp(1);
+			}
+			if (getKey(KeyEvent.VK_D)) {
+				moveRight(1);
+			}
+			if (getKey(KeyEvent.VK_A)) {
+				moveLeft(1);
+			}
+		}
+
+		@Override
+		public void moveLeft(double multiplier) {
+			setX(getX() - 5);
+		}
+
+		@Override
+		public void moveRight(double multiplier) {
+			setX(getX() + 5);
+		}
+
+		@Override
+		public void moveUp(double multiplier) {
+			if (atRest) {
+				velocity = -10;
+				atRest = false;
+			}
+		}
+
+		@Override
+		public void moveDown(double multiplier) {
+			// TODO Auto-generated method stub
+
 		}
 	}
 
