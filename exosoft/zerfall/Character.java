@@ -46,11 +46,9 @@ class Character extends Entity implements Moveable {
 	@Override
 	public void moveDown(double multiplier) {
 		// TODO Auto-generated method stub
-
 	}
 	@Override
 	public void visual() {
 		// TODO Auto-generated method stub
-		
 	}
 }

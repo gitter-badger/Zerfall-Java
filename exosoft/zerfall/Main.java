@@ -21,10 +21,7 @@ import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 public class Main extends Framework {
-	static Sheet sheet;
 	static Character player;
-	static Environment map;
-	static KeyListener keywatch;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
