@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -22,6 +23,7 @@ import kuusisto.tinysound.TinySound;
 @SuppressWarnings("serial")
 public class Main extends Framework {
 	static Character player;
+	static Environment.Object j;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
@@ -33,7 +35,10 @@ public class Main extends Framework {
 		player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch);
 		player.setLocation(0, 0);
 		player.setVelocity(0);
-		map.addObject(new Rectangle(0, 600, 720, 200));
+		map.addObject(new Rectangle(50, 200, 720, 25));
+		map.addObject(new Rectangle(250, 600, 720, 25));
+		j = map.new Object(new Point(80, 80), new Point(90, 90), new Point(80, 90));
+		j.setTexture("resources/");
 		map.spawnEntity(player);
 
 		drawTimer = new Timer(1000 / drawRate, new ActionListener() {
@@ -75,7 +80,13 @@ public class Main extends Framework {
 			g.setColor(Color.blue);
 			for (Shape object : map.getObjects()) {
 				g.draw(object);
+				if (player.getBounds().intersects(object.getBounds2D())) {
+					g.setColor(Color.green);
+					g.draw(player.getBounds().createIntersection(object.getBounds2D()));
+					g.setColor(Color.blue);
+				}
 			}
+			g.drawImage(j.getTexturedObject(), j.getBounds().x, j.getBounds().y, null);
 			g.dispose();
 		}
 	}
