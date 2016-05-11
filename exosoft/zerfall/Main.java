@@ -23,7 +23,6 @@ import kuusisto.tinysound.TinySound;
 @SuppressWarnings("serial")
 public class Main extends Framework {
 	static Character player;
-	static Environment.Object j;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
@@ -37,8 +36,6 @@ public class Main extends Framework {
 		player.setVelocity(0);
 		map.addObject(new Rectangle(50, 200, 720, 25));
 		map.addObject(new Rectangle(250, 600, 720, 25));
-		j = map.new Object(new Point(80, 80), new Point(90, 90), new Point(80, 90));
-		j.setTexture("resources/");
 		map.spawnEntity(player);
 
 		drawTimer = new Timer(1000 / drawRate, new ActionListener() {
@@ -51,7 +48,7 @@ public class Main extends Framework {
 			public void actionPerformed(ActionEvent e) {
 				player.movement();
 				player.physics();
-				player.collision();
+				map.execute();
 			}
 		});
 		EventQueue.invokeLater(new Runnable() {
@@ -78,15 +75,7 @@ public class Main extends Framework {
 			g.setColor(Color.red);
 			g.draw(player.getBounds());
 			g.setColor(Color.blue);
-			for (Shape object : map.getObjects()) {
-				g.draw(object);
-				if (player.getBounds().intersects(object.getBounds2D())) {
-					g.setColor(Color.green);
-					g.draw(player.getBounds().createIntersection(object.getBounds2D()));
-					g.setColor(Color.blue);
-				}
-			}
-			g.drawImage(j.getTexturedObject(), j.getBounds().x, j.getBounds().y, null);
+			g = map.drawObjects(g);
 			g.dispose();
 		}
 	}
