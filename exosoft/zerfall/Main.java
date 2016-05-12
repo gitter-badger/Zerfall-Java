@@ -5,8 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,6 +14,7 @@ import javax.swing.Timer;
 
 import exosoft.iso.Environment;
 import exosoft.iso.Framework;
+import exosoft.iso.Object;
 import exosoft.iso.Sprite.SheetType;
 import exosoft.util.KeyObserver;
 import exosoft.util.Window;
@@ -34,8 +34,8 @@ public class Main extends Framework {
 		player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch);
 		player.setLocation(0, 0);
 		player.setVelocity(0);
-		map.addObject(new Rectangle(50, 200, 720, 25));
-		map.addObject(new Rectangle(250, 600, 720, 25));
+		map.addObject(new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
+		map.addObject(new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
 		map.spawnEntity(player);
 
 		drawTimer = new Timer(1000 / drawRate, new ActionListener() {
@@ -68,6 +68,7 @@ public class Main extends Framework {
 		public void paintComponent(Graphics g1) {
 			super.paintComponent(g1);
 			Graphics2D g = (Graphics2D) g1;
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setColor(Color.white);
 			g.fillRect(0, 0, getWidth(), getHeight());
 			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntX(), player.getIntY(),
