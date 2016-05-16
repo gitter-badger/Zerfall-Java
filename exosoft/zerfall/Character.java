@@ -4,8 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import exosoft.iso.Entity;
+import exosoft.iso.KeyObserver;
 import exosoft.iso.Moveable;
-import exosoft.util.KeyObserver;
 
 class Character extends Entity implements Moveable {
 	KeyObserver keywatch;

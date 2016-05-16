@@ -9,15 +9,18 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Scanner;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import exosoft.iso.Environment;
 import exosoft.iso.Framework;
+import exosoft.iso.KeyObserver;
 import exosoft.iso.Object;
 import exosoft.iso.Sprite.SheetType;
-import exosoft.util.KeyObserver;
 import exosoft.util.Window;
 import kuusisto.tinysound.TinySound;
 
@@ -46,7 +49,36 @@ public class Main extends Framework {
 			boolean pauseAvailable;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent event) {
+				detectPauseAction();
+				Scanner scanInput = new Scanner(System.in);
+				String data = scanInput.nextLine();
+				String[] splitData = data.split(".");
+				scanInput.close();
+				java.lang.Object instance = null;
+				try {
+					instance = getClass().getDeclaredField(splitData[0]).get(this);
+				} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+						| SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				Method method = null;
+				try {
+					method = instance.getClass().getMethod(splitData[1].split("(")[0]);
+				} catch (NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					method.invoke(splitData[1].split("(")[0]);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			public void detectPauseAction() {
 				if (keywatch.getKey(KeyEvent.VK_ESCAPE) && !pauseAvailable) {
 					pauseAvailable = true;
 				} else if (!keywatch.getKey(KeyEvent.VK_ESCAPE) && pauseAvailable) {
@@ -108,7 +140,7 @@ public class Main extends Framework {
 			g.setColor(Color.red);
 			g.draw(player.getBounds());
 			g.setColor(Color.blue);
-			g = gameWorld.drawObjects(g);
+			g = gameWorld.drawWorld(g);
 			g.dispose();
 		}
 	}
