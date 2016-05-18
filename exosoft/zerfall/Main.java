@@ -9,11 +9,9 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Scanner;
 
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 import exosoft.iso.Environment;
@@ -28,6 +26,7 @@ import kuusisto.tinysound.TinySound;
 public class Main extends Framework {
 	static Character player;
 	static Timer metaHandler;
+	static JTextField console;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
@@ -44,37 +43,36 @@ public class Main extends Framework {
 		gameWorld.addObject(
 				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
 		gameWorld.spawnEntity(player, 0, 0);
+		console = new JTextField(10);
+		console.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (console.getText() != null) {
+					readConsoleInput(console.getText());
+				}
+			}
+			
+		});
 
 		metaHandler = new Timer(1000 / 120, new ActionListener() {
 			boolean pauseAvailable;
+			boolean consoleAvailable;
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				detectPauseAction();
-				Scanner scanInput = new Scanner(System.in);
-				String data = scanInput.nextLine();
-				String[] splitData = data.split(".");
-				scanInput.close();
-				java.lang.Object instance = null;
-				try {
-					instance = getClass().getDeclaredField(splitData[0]).get(this);
-				} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-						| SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				detectConsoleAction();
+			}
+			
+			private void detectConsoleAction() {
+				if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && !consoleAvailable) {
+					consoleAvailable = true;
+				} else if (!keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && consoleAvailable) {
+					consoleAvailable = false;
 				}
-				Method method = null;
-				try {
-					method = instance.getClass().getMethod(splitData[1].split("(")[0]);
-				} catch (NoSuchMethodException | SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					method.invoke(splitData[1].split("(")[0]);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (consoleAvailable) {
+					detectTheFuckingConsoleAction();
 				}
 			}
 
@@ -109,6 +107,10 @@ public class Main extends Framework {
 			public void run() {
 				Window window = new Window("Zerfall", 1280, 720);
 				window.add(sheet);
+				sheet.add(console);
+				console.setSize(1260, 50);
+				console.setVisible(false);
+				console.setLocation(10, 10);
 				window.setFocusable(true);
 				window.addKeyListener(keywatch);
 			}
@@ -125,6 +127,44 @@ public class Main extends Framework {
 			} else {
 				gameHandler.start();
 			}
+		}
+	}
+	
+	protected static void detectTheFuckingConsoleAction() {
+		if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE)) {
+			if (console.isVisible()) {
+				console.setVisible(false);
+			} else {
+				console.setVisible(true);
+				console.requestFocus();
+			}
+		}
+	}
+	
+	private static void readConsoleInput(String data) {
+		String[] splitData = data.split(" ");
+		if (splitData.length == 2) {
+			switch (splitData[0]) {
+			case "dev-mode":
+				switch (splitData[1]) {
+				case "on":
+					gameWorld.setDevmode(true);
+					break;
+				case "off":
+					gameWorld.setDevmode(false);
+					break;
+				case "toggle":
+					gameWorld.setDevmode(!gameWorld.isDevmode());
+					break;
+				default:
+					System.err.println("Incorrect modifier. List of modifiers: {on, off, toggle}");
+				}
+				break;
+			}
+		} else if (splitData.length > 2) {
+			System.err.println("Too many arguments given. Maximum of two arguments.");
+		} else if (splitData.length < 2) {
+			System.err.println("Not enough arguments given. Please specify a command and a modifier");
 		}
 	}
 
