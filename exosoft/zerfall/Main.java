@@ -1,11 +1,16 @@
 package exosoft.zerfall;
 
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -26,7 +31,9 @@ import kuusisto.tinysound.TinySound;
 public class Main extends Framework {
 	static Character player;
 	static Timer metaHandler;
-	static JTextField console;
+	static JTextField consoleInput;
+	static JPanel console;
+	static Window window;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
@@ -43,37 +50,38 @@ public class Main extends Framework {
 		gameWorld.addObject(
 				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
 		gameWorld.spawnEntity(player, 0, 0);
-		console = new JTextField(10);
-		console.addActionListener(new ActionListener() {
+		consoleInput = new JTextField(10);
+		consoleInput.setBackground(Color.gray);
+		consoleInput.setSelectedTextColor(Color.white);
+		consoleInput.setVisible(true);
+		consoleInput.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (console.getText() != null) {
-					readConsoleInput(console.getText());
+				if (consoleInput.getText() != null) {
+					readConsoleInput(consoleInput.getText());
 				}
 			}
-			
+
 		});
 
 		metaHandler = new Timer(1000 / 120, new ActionListener() {
 			boolean pauseAvailable;
-			boolean consoleAvailable;
+			boolean consoleActionAvailable = true;
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				detectPauseAction();
 				detectConsoleAction();
 			}
-			
-			private void detectConsoleAction() {
-				if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && !consoleAvailable) {
-					consoleAvailable = true;
-				} else if (!keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && consoleAvailable) {
-					consoleAvailable = false;
+
+			private synchronized void detectConsoleAction() {
+				if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && consoleActionAvailable) {
+					consoleInput.setVisible(!consoleInput.isVisible());
+					consoleInput.requestFocusInWindow();
+					window.revalidate();
 				}
-				if (consoleAvailable) {
-					detectTheFuckingConsoleAction();
-				}
+				consoleActionAvailable = !keywatch.getKey(KeyEvent.VK_BACK_QUOTE);
 			}
 
 			public void detectPauseAction() {
@@ -105,14 +113,24 @@ public class Main extends Framework {
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				Window window = new Window("Zerfall", 1280, 720);
-				window.add(sheet);
+				consoleInput.setHorizontalAlignment(JTextField.LEFT);
+				consoleInput.setBounds(0, 0, 1280, 50);
+				console = new JPanel();
 				sheet.add(console);
-				console.setSize(1260, 50);
-				console.setVisible(false);
-				console.setLocation(10, 10);
+				console.setLayout(new GridBagLayout());
+				console.add(consoleInput);
+				console.setOpaque(false);
+				window = new Window("Zerfall", 1280, 720);
+				window.add(sheet);
+				sheet.setLayout(new CardLayout());
+				window.setComponentZOrder(sheet, 0);
+				sheet.setSize(1280, 720);
+				sheet.setMinimumSize(new Dimension(1280, 720));
+				sheet.setVisible(true);
 				window.setFocusable(true);
 				window.addKeyListener(keywatch);
+				window.revalidate();
+				sheet.revalidate();
 			}
 		});
 		metaHandler.start();
@@ -129,18 +147,7 @@ public class Main extends Framework {
 			}
 		}
 	}
-	
-	protected static void detectTheFuckingConsoleAction() {
-		if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE)) {
-			if (console.isVisible()) {
-				console.setVisible(false);
-			} else {
-				console.setVisible(true);
-				console.requestFocus();
-			}
-		}
-	}
-	
+
 	private static void readConsoleInput(String data) {
 		String[] splitData = data.split(" ");
 		if (splitData.length == 2) {
@@ -149,16 +156,22 @@ public class Main extends Framework {
 				switch (splitData[1]) {
 				case "on":
 					gameWorld.setDevmode(true);
+					System.out.println("devmode on");
 					break;
 				case "off":
 					gameWorld.setDevmode(false);
+					System.out.println("devmode off");
 					break;
 				case "toggle":
 					gameWorld.setDevmode(!gameWorld.isDevmode());
+					System.out.println("devmode toggled");
 					break;
 				default:
 					System.err.println("Incorrect modifier. List of modifiers: {on, off, toggle}");
 				}
+				break;
+			default:
+				System.err.println("Command unrecognized");
 				break;
 			}
 		} else if (splitData.length > 2) {
@@ -175,7 +188,7 @@ public class Main extends Framework {
 			Graphics2D g = (Graphics2D) g1;
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setColor(Color.white);
-			g.fillRect(0, 0, getWidth(), getHeight());
+			//g.fillRect(0, 0, getWidth(), getHeight());
 			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntX(), player.getIntY(), null);
 			g.setColor(Color.red);
 			g.draw(player.getBounds());
