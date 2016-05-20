@@ -49,8 +49,5 @@ public class Main extends Framework {
 				sheet.revalidate();
 			}
 		});
-		metaHandler.start();
-		gameHandler.start();
-		visualHandler.start();
 	}
 }
