@@ -29,12 +29,11 @@ import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 public class Main extends Framework {
-	static boolean drawFPS;
-	static double framerate;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
 		initiateGame();
+		initiateThreads();
 		gameWorld.addObject(
 				new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
 		gameWorld.addObject(
@@ -44,6 +43,7 @@ public class Main extends Framework {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				initiateWindow();
+				initiateSheet();
 				initiateConsole();
 				window.revalidate();
 				sheet.revalidate();
