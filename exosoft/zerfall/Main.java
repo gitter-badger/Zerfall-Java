@@ -66,7 +66,7 @@ public class Main extends Framework {
 		});
 
 		metaHandler = new Timer(1000 / 120, new ActionListener() {
-			boolean pauseAvailable;
+			boolean pauseActionAvailable;
 			boolean consoleActionAvailable = true;
 
 			@Override
@@ -85,14 +85,14 @@ public class Main extends Framework {
 			}
 
 			public void detectPauseAction() {
-				if (keywatch.getKey(KeyEvent.VK_ESCAPE) && !pauseAvailable) {
-					pauseAvailable = true;
-				} else if (!keywatch.getKey(KeyEvent.VK_ESCAPE) && pauseAvailable) {
-					pauseAvailable = false;
+				if (keywatch.getKey(KeyEvent.VK_ESCAPE) && pauseActionAvailable) {
+					if (gameHandler.isRunning()) {
+						gameHandler.stop();
+					} else {
+						gameHandler.start();
+					}
 				}
-				if (pauseAvailable) {
-					detectTheFuckingPauseAction();
-				}
+				pauseActionAvailable = !keywatch.getKey(KeyEvent.VK_ESCAPE);
 			}
 		});
 
@@ -120,6 +120,7 @@ public class Main extends Framework {
 				console.setLayout(new GridBagLayout());
 				console.add(consoleInput);
 				console.setOpaque(false);
+				consoleInput.setVisible(false);
 				window = new Window("Zerfall", 1280, 720);
 				window.add(sheet);
 				sheet.setLayout(new CardLayout());
@@ -129,6 +130,7 @@ public class Main extends Framework {
 				sheet.setVisible(true);
 				window.setFocusable(true);
 				window.addKeyListener(keywatch);
+				consoleInput.addKeyListener(keywatch);
 				window.revalidate();
 				sheet.revalidate();
 			}
@@ -136,16 +138,6 @@ public class Main extends Framework {
 		metaHandler.start();
 		gameHandler.start();
 		visualHandler.start();
-	}
-
-	protected static void detectTheFuckingPauseAction() {
-		if (keywatch.getKey(KeyEvent.VK_ESCAPE)) {
-			if (gameHandler.isRunning()) {
-				gameHandler.stop();
-			} else {
-				gameHandler.start();
-			}
-		}
 	}
 
 	private static void readConsoleInput(String data) {
@@ -187,14 +179,8 @@ public class Main extends Framework {
 			super.paintComponent(g1);
 			Graphics2D g = (Graphics2D) g1;
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setColor(Color.white);
-			//g.fillRect(0, 0, getWidth(), getHeight());
-			g.drawImage(player.getSprite(player.getSpriteNum()), player.getIntX(), player.getIntY(), null);
-			g.setColor(Color.red);
-			g.draw(player.getBounds());
-			g.setColor(Color.blue);
 			g = gameWorld.drawWorld(g);
-			g.dispose();
+			// g.dispose();
 		}
 	}
 
