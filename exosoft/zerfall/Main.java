@@ -30,6 +30,7 @@ import kuusisto.tinysound.TinySound;
 @SuppressWarnings("serial")
 public class Main extends Framework {
 	static boolean drawFPS;
+	static double framerate;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
@@ -70,10 +71,18 @@ public class Main extends Framework {
 		});
 
 		visualHandler = new Timer(1000 / drawRate, new ActionListener() {
+			long logTime = system.nanoTime();
+			
 			public void actionPerformed(ActionEvent e) {
+				calculateFramerate();
 				player.visual();
 				sheet.repaint();
 			}
+			
+			private void calculateFramerate(long currentTime) {
+				framerate = (System.nanoTime() - logTime).doubleValue() * 1000;
+				logTime = System.nanoTime();
+			} 
 		});
 
 		gameHandler = new Timer(1000 / gameFrequency, new ActionListener() {
