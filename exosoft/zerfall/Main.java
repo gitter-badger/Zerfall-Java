@@ -29,22 +29,16 @@ import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")
 public class Main extends Framework {
-	static Character player;
+	static boolean drawFPS;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
-		metaFrequency = 120;
-		gameFrequency = 120;
-		drawRate = 60;
-		keywatch = new KeyObserver();
-		gameWorld = new Environment();
-		player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch);
-		player.setLocation(0, 0);
+		initiateGame();
 		gameWorld.addObject(
 				new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
 		gameWorld.addObject(
 				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
-		gameWorld.spawnEntity(player, 0, 0);
+		gameWorld.spawnEntity(player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch), 0, 0);
 		metaHandler = new Timer(1000 / 120, new ActionListener() {
 			boolean pauseActionAvailable = true;
 			boolean consoleActionAvailable = true;
@@ -92,36 +86,8 @@ public class Main extends Framework {
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				consoleInput.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if (consoleInput.getText() != null) {
-							readConsoleInput(consoleInput.getText());
-							consoleInput.setText("");
-						}
-					}
-				});
-				window = new Window("Zerfall", 1280, 720);
-				window.setFocusable(true);
-				window.addKeyListener(keywatch = new KeyObserver());
-				window.add(sheet = new JPanel() {
-					@Override
-					public void paintComponent(Graphics g1) {
-						super.paintComponent(g1);
-						Graphics2D g = (Graphics2D) g1;
-						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						g = gameWorld.drawWorld(g);
-					}
-				});
-				sheet.setLayout(new CardLayout());
-				sheet.setSize(1280, 720);
-				sheet.setVisible(true);
-				sheet.add(console = new JPanel());
-				console.setLayout(new GridBagLayout());
-				console.setOpaque(false);
-				console.add(consoleInput = new JTextField(50));
-				consoleInput.setHorizontalAlignment(JTextField.LEFT);
-				consoleInput.setVisible(false);
+				initiateWindow();
+				initiateConsole();
 				window.revalidate();
 				sheet.revalidate();
 			}
@@ -150,9 +116,24 @@ public class Main extends Framework {
 					System.out.println("devmode toggled");
 					break;
 				default:
-					System.err.println("Incorrect modifier. List of modifiers: {on, off, toggle}");
+					System.err.println("Invalid modifier. Valid modifiers: {on, off, toggle}");
 				}
 				break;
+			case "drawfps":
+				switch(splitData[1]) {
+				case "on":
+					drawFPS = true;
+					break;
+				case "off":
+					drawFPS = false;
+					break;
+				case "toggle":
+					drawFPS = !drawFPS;
+					break;
+				default:
+					System.err.println("Invalid modifier. Valid modifiers: {on, off, toggle}");
+					break;
+				}
 			default:
 				System.err.println("Command unrecognized");
 				break;
