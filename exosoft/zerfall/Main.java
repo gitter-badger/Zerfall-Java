@@ -30,43 +30,23 @@ import kuusisto.tinysound.TinySound;
 @SuppressWarnings("serial")
 public class Main extends Framework {
 	static Character player;
-	static Timer metaHandler;
-	static JTextField consoleInput;
-	static JPanel console;
-	static Window window;
 
 	public static void main(String[] uselessbullshit) {
 		TinySound.init();
+		metaFrequency = 120;
 		gameFrequency = 120;
 		drawRate = 60;
-		sheet = new Sheet();
 		keywatch = new KeyObserver();
 		gameWorld = new Environment();
 		player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch);
 		player.setLocation(0, 0);
-		player.setVelocity(0);
 		gameWorld.addObject(
 				new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
 		gameWorld.addObject(
 				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
 		gameWorld.spawnEntity(player, 0, 0);
-		consoleInput = new JTextField(10);
-		consoleInput.setBackground(Color.gray);
-		consoleInput.setSelectedTextColor(Color.white);
-		consoleInput.setVisible(true);
-		consoleInput.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (consoleInput.getText() != null) {
-					readConsoleInput(consoleInput.getText());
-				}
-			}
-
-		});
-
 		metaHandler = new Timer(1000 / 120, new ActionListener() {
-			boolean pauseActionAvailable;
+			boolean pauseActionAvailable = true;
 			boolean consoleActionAvailable = true;
 
 			@Override
@@ -79,12 +59,11 @@ public class Main extends Framework {
 				if (keywatch.getKey(KeyEvent.VK_BACK_QUOTE) && consoleActionAvailable) {
 					consoleInput.setVisible(!consoleInput.isVisible());
 					consoleInput.requestFocusInWindow();
-					window.revalidate();
 				}
 				consoleActionAvailable = !keywatch.getKey(KeyEvent.VK_BACK_QUOTE);
 			}
 
-			public void detectPauseAction() {
+			private synchronized void detectPauseAction() {
 				if (keywatch.getKey(KeyEvent.VK_ESCAPE) && pauseActionAvailable) {
 					if (gameHandler.isRunning()) {
 						gameHandler.stop();
@@ -113,24 +92,36 @@ public class Main extends Framework {
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				consoleInput.setHorizontalAlignment(JTextField.LEFT);
-				consoleInput.setBounds(0, 0, 1280, 50);
-				console = new JPanel();
-				sheet.add(console);
-				console.setLayout(new GridBagLayout());
-				console.add(consoleInput);
-				console.setOpaque(false);
-				consoleInput.setVisible(false);
+				consoleInput.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (consoleInput.getText() != null) {
+							readConsoleInput(consoleInput.getText());
+							consoleInput.setText("");
+						}
+					}
+				});
 				window = new Window("Zerfall", 1280, 720);
-				window.add(sheet);
-				sheet.setLayout(new CardLayout());
-				window.setComponentZOrder(sheet, 0);
-				sheet.setSize(1280, 720);
-				sheet.setMinimumSize(new Dimension(1280, 720));
-				sheet.setVisible(true);
 				window.setFocusable(true);
-				window.addKeyListener(keywatch);
-				consoleInput.addKeyListener(keywatch);
+				window.addKeyListener(keywatch = new KeyObserver());
+				window.add(sheet = new JPanel() {
+					@Override
+					public void paintComponent(Graphics g1) {
+						super.paintComponent(g1);
+						Graphics2D g = (Graphics2D) g1;
+						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+						g = gameWorld.drawWorld(g);
+					}
+				});
+				sheet.setLayout(new CardLayout());
+				sheet.setSize(1280, 720);
+				sheet.setVisible(true);
+				sheet.add(console = new JPanel());
+				console.setLayout(new GridBagLayout());
+				console.setOpaque(false);
+				console.add(consoleInput = new JTextField(50));
+				consoleInput.setHorizontalAlignment(JTextField.LEFT);
+				consoleInput.setVisible(false);
 				window.revalidate();
 				sheet.revalidate();
 			}
@@ -144,7 +135,7 @@ public class Main extends Framework {
 		String[] splitData = data.split(" ");
 		if (splitData.length == 2) {
 			switch (splitData[0]) {
-			case "dev-mode":
+			case "devmode":
 				switch (splitData[1]) {
 				case "on":
 					gameWorld.setDevmode(true);
@@ -170,17 +161,6 @@ public class Main extends Framework {
 			System.err.println("Too many arguments given. Maximum of two arguments.");
 		} else if (splitData.length < 2) {
 			System.err.println("Not enough arguments given. Please specify a command and a modifier");
-		}
-	}
-
-	static class Sheet extends JPanel {
-		@Override
-		public void paintComponent(Graphics g1) {
-			super.paintComponent(g1);
-			Graphics2D g = (Graphics2D) g1;
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g = gameWorld.drawWorld(g);
-			// g.dispose();
 		}
 	}
 
