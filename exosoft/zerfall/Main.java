@@ -1,30 +1,11 @@
 package exosoft.zerfall;
 
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
-
-import exosoft.iso.Environment;
 import exosoft.iso.Framework;
-import exosoft.iso.KeyObserver;
 import exosoft.iso.Object;
 import exosoft.iso.Sprite.SheetType;
-import exosoft.util.Window;
 import kuusisto.tinysound.TinySound;
 
 @SuppressWarnings("serial")

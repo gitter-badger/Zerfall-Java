@@ -14,25 +14,34 @@ class Character extends Entity implements Moveable {
 		this.keywatch = (KeyObserver) keywatch;
 	}
 	public void movement() {
-		if (keywatch.getKey(KeyEvent.VK_W)) {
-			moveUp(1);
-		}
 		if (keywatch.getKey(KeyEvent.VK_D)) {
 			moveRight(1);
 		}
 		if (keywatch.getKey(KeyEvent.VK_A)) {
 			moveLeft(1);
 		}
+		if (keywatch.getKey(KeyEvent.VK_W)) {
+			moveUp(1);
+		}
+		if (atRest && spriteNum % 2 == 1) {
+		    spriteNum--;
+		}
 	}
 
 	@Override
 	public void moveLeft(double multiplier) {
 		setX(getX() - 5);
+		if (spriteNum % 4 > 1) {
+		    spriteNum -= 2;
+		}
 	}
 
 	@Override
 	public void moveRight(double multiplier) {
 		setX(getX() + 5);
+		if (spriteNum % 4 < 2) {
+		    spriteNum += 2;
+		}
 	}
 
 	@Override
@@ -40,6 +49,9 @@ class Character extends Entity implements Moveable {
 		if (atRest) {
 			velocity = -10;
 			atRest = false;
+			if (spriteNum % 2 == 0) {
+			    spriteNum++;
+			}
 		}
 	}
 
@@ -49,6 +61,12 @@ class Character extends Entity implements Moveable {
 	}
 	@Override
 	public void visual() {
-		// TODO Auto-generated method stub
+		while (spriteNum >= sprites.length) {
+		    spriteNum -= 2;
+		}
+		while (spriteNum < 0) {
+		    spriteNum += 2;
+		}
+		activeSprite = getSprite(spriteNum);
 	}
 }
