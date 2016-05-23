@@ -2,7 +2,6 @@ package exosoft.zerfall;
 
 import java.awt.EventQueue;
 import java.awt.Point;
-
 import exosoft.iso.Framework;
 import exosoft.iso.Object;
 import exosoft.iso.Sprite.SheetType;
@@ -18,14 +17,19 @@ public class Main extends Framework {
 				new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
 		gameWorld.addObject(
 				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
-		gameWorld.spawnEntity(player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch), 0, 0);
+		gameWorld.spawnEntity(
+				player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch), 0, 0);
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				initiateWindow();
 				initiateConsole();
+				finalizeWindow();
 				window.revalidate();
 				sheet.revalidate();
+				console.revalidate();
+				sheet.requestFocusInWindow();
+				sheet.addKeyListener(keywatch);
 				initiateThreads();
 			}
 		});
