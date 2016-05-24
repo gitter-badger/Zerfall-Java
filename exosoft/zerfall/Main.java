@@ -14,9 +14,9 @@ public class Main extends Framework {
 		TinySound.init();
 		initiateGame();
 		gameWorld.addObject(
-				new Object(new Point(250, 200), new Point(720, 200), new Point(720, 225), new Point(250, 225)));
+				new Object(new Point(100, 200), new Point(720, 200), new Point(900, 225), new Point(250, 225)));
 		gameWorld.addObject(
-				new Object(new Point(50, 600), new Point(1080, 600), new Point(720, 625), new Point(250, 625)));
+				new Object(new Point(50, 500), new Point(1080, 500), new Point(720, 525), new Point(250, 525)));
 		gameWorld.spawnEntity(
 				player = new Character(SheetType.HORIZONTAL, "resources/sprites/player.png", 175, 161, keywatch), 0, 0);
 
